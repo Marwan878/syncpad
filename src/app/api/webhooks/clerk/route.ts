@@ -48,14 +48,14 @@ export async function POST(request: NextRequest) {
 
     const newUser: User = {
       id,
-      name: `${first_name} ${last_name}`,
-      email: email_addresses[0].email_address,
+      name: `${first_name} ${last_name}`.trim() || id,
+      email: email_addresses[0]?.email_address,
       avatarUrl: image_url,
       created_at: new Date(created_at).toISOString(),
     };
 
     const INSERT_USER = `
-      mutation InsertUser($id: String!, $name: String!, $email: String!, $avatarUrl: String!, $created_at: timestamptz!) {
+      mutation InsertUser($id: String!, $name: String!, $email: String, $avatarUrl: String!, $created_at: timestamptz!) {
         insert_users_one(object: {
           id: $id,
           name: $name,
