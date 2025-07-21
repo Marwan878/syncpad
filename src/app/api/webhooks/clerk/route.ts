@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export default async function POST(request: Request) {
+export async function POST(request: Request) {
   const SIGNING_SECRET = process.env.CLERK_WEBHOOK_SECRET;
   if (!SIGNING_SECRET) {
     return NextResponse.json(
@@ -13,4 +13,14 @@ export default async function POST(request: Request) {
   }
 
   console.log(request);
+
+  return NextResponse.json(
+    {
+      message: "Webhook received",
+      success: true,
+    },
+    {
+      status: 200,
+    }
+  );
 }
