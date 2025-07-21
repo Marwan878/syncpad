@@ -2,6 +2,6 @@ export type User = {
   id: string;
   name: string;
   email?: string;
-  avatarUrl: string;
+  avatar_url: string;
   created_at: string;
 };
