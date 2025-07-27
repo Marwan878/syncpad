@@ -6,6 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     const event = await verifyWebhook(request);
 
+    // Only handle user.created events
     if (event.type !== "user.created") {
       return NextResponse.json(
         {
@@ -18,6 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if the environment variables are set
     const HASURA_URL = process.env.HASURA_URL;
     const HASURA_ADMIN_SECRET = process.env.HASURA_ADMIN_SECRET;
 
@@ -37,6 +39,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Create the user data from the event
     const {
       id,
       last_name,
@@ -68,6 +71,7 @@ export async function POST(request: NextRequest) {
       }
     `;
 
+    // Insert the user into the database
     const response = await fetch(HASURA_URL, {
       method: "POST",
       headers: {

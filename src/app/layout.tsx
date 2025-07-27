@@ -10,6 +10,11 @@ import {
 } from "@clerk/nextjs";
 
 import "./globals.css";
+import { ourFileRouter } from "./api/uploadthing/core";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+import { Toaster } from "react-hot-toast";
+import Logo from "@/components/ui/logo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,23 +42,31 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+          <NextSSRPlugin
+            /**
+             * The `extractRouterConfig` will extract **only** the route configs
+             * from the router to prevent additional information from being
+             * leaked to the client. The data passed to the client is the same
+             * as if you were to fetch `/api/uploadthing` directly.
+             */
+            routerConfig={extractRouterConfig(ourFileRouter)}
+          />
+          <Toaster />
           <header className="border-b border-gray-200 bg-white">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
                 <div className="flex items-center">
-                  <h1 className="text-xl font-semibold text-gray-900">
-                    SyncPad
-                  </h1>
+                  <Logo />
                 </div>
                 <div className="flex items-center space-x-4">
                   <SignedOut>
                     <SignInButton>
-                      <button className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                      <button className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                         Sign In
                       </button>
                     </SignInButton>
                     <SignUpButton>
-                      <button className="rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600">
+                      <button className="rounded-md bg-brand hover:bg-brand-dark px-3 py-2 text-sm font-semibold text-white shadow-sm">
                         Sign Up
                       </button>
                     </SignUpButton>
