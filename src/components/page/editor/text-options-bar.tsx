@@ -78,10 +78,7 @@ export default function TextOptionsBar({
 
   useEffect(() => {
     const updateBarPosition = () => {
-      console.log("Updating bar position");
       const { from, to } = editor.state.selection;
-
-      console.log(from, to);
 
       if (from === to) {
         return;

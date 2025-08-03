@@ -23,6 +23,8 @@
 
   --color-state-error: #eb5757;
   --color-state-warning: #f2c94c;
+
+  --breakpoint-xs: 460px;
 }
 
 @layer utilities {
@@ -48,7 +50,7 @@ ol {
   list-style-type: decimal;
 }
 
-a {
+.tiptap a {
   color: var(--color-brand);
   text-decoration: underline;
   text-underline-offset: 2px;

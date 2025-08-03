@@ -1,8 +1,9 @@
-export { default as WorkspaceCard } from "./workspace-card";
-export { default as WorkspaceList } from "./workspace-list";
-export { default as AddWorkspaceModal } from "./add-workspace-modal";
-export { default as DeleteWorkspaceModal } from "./delete-workspace-modal";
-export { default as PageItem } from "./page-item";
-export { default as PageList } from "./page-list";
-export { default as AddPageModal } from "./add-page-modal";
+export { default as WorkspaceCard } from "../workspaces/workspace-list/workspace-card/workspace-card";
+export { default as WorkspaceList } from "../workspaces/workspace-list/workspace-list";
+export { default as AddWorkspaceModal } from "../workspaces/add-workspace-modal/add-workspace-modal";
+export { default as DeleteWorkspaceModal } from "../workspaces/workspace-list/workspace-card/delete-workspace-modal";
+export { default as PageItem } from "./page-list/page-item/page-item";
+export { default as PageList } from "./page-list/page-list";
+export { default as AddPageModal } from "./page-list/add-page-modal";
 export { default as DeletePageModal } from "./delete-page-modal";
+export { default as WorkspaceHeader } from "./header";

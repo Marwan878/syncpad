@@ -1,7 +1,8 @@
 import { X } from "lucide-react";
+import { ReactNode } from "react";
 
 type ModalHeaderProps = {
-  title: string;
+  title: ReactNode;
   onClose: () => void;
 };
 

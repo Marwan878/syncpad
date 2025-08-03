@@ -1,5 +1,5 @@
+import { cn } from "@/lib/utils/cn";
 import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
-import clsx from "clsx";
 import { Maximize2 } from "lucide-react";
 import NextImage from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -61,7 +61,7 @@ export function PageImage({ src, alt, className }: Readonly<ImageProps>) {
 
   return (
     <div
-      className={clsx("relative mb-8", className)}
+      className={cn("relative mb-8", className)}
       style={{ width: `${width}px`, height: `${height}px` }}
     >
       <NextImage src={src} alt={alt} className="object-cover" fill />
@@ -70,7 +70,7 @@ export function PageImage({ src, alt, className }: Readonly<ImageProps>) {
         ref={resizeButtonRef}
         aria-label="Drag to resize"
         title="Drag to resize"
-        className={clsx(
+        className={cn(
           "absolute -bottom-8 -end-8 rounded-sm hover:bg-black/20 p-1 transition-colors",
           isGrabbing && "cursor-grabbing bg-black/20",
           !isGrabbing && "cursor-grab"

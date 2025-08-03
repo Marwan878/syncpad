@@ -1,4 +1,4 @@
-import { UploadDropzone, useUploadThing } from "@/utils/uploadthing";
+import { UploadDropzone, useUploadThing } from "@/lib/uploadthing";
 import { EditorContent, Editor as EditorType } from "@tiptap/react";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -150,8 +150,6 @@ export default function Editor({
         endpoint={(routeRegistry) => routeRegistry.imageUploader}
         onChange={async (files) => {
           setUploadZoneVisible(false);
-
-          console.log(files);
 
           const newFiles = files.map((file) => {
             const newFile = new File([file], crypto.randomUUID(), {

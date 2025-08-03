@@ -1,5 +1,8 @@
+import { cn } from "@/lib/utils/cn";
+
 export default function ModalBody({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
-  return <div className="p-6">{children}</div>;
+  className,
+}: Readonly<{ children: React.ReactNode; className?: string }>) {
+  return <div className={cn("p-6", className)}>{children}</div>;
 }

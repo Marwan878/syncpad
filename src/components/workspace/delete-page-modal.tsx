@@ -1,11 +1,10 @@
 "use client";
 
 import { Modal, ModalBody, ModalFooter } from "@/components/ui/modal";
-import { Page } from "@/types/workspace";
+import { Page } from "@/types/page";
 import { AlertTriangle } from "lucide-react";
 
 type DeletePageModalProps = {
-  isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   page: Page | null;
@@ -13,7 +12,6 @@ type DeletePageModalProps = {
 };
 
 export default function DeletePageModal({
-  isOpen,
   onClose,
   onConfirm,
   page,
@@ -34,7 +32,7 @@ export default function DeletePageModal({
   const hasContent = page.content && page.content.trim().length > 0;
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Delete Page">
+    <Modal onClose={handleClose} title="Delete Page">
       <ModalBody>
         <div className="w-96">
           <div className="flex items-start space-x-3">
@@ -45,7 +43,7 @@ export default function DeletePageModal({
               <p className="text-sm text-text-primary mb-3">
                 Are you sure you want to delete the page{" "}
                 <span className="font-semibold">
-                  "{page.title || "Untitled Page"}"
+                  &quot;{page.title || "Untitled Page"}&quot;
                 </span>
                 ?
               </p>
@@ -60,9 +58,6 @@ export default function DeletePageModal({
                       All content in this page will be permanently deleted
                     </li>
                     <li>Any collaborative changes will be lost</li>
-                    {page.is_favorite && (
-                      <li>This page will be removed from your favorites</li>
-                    )}
                   </ul>
                 </div>
               </div>
