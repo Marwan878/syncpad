@@ -1,13 +1,19 @@
-import { Hero, Features, CallToAction } from "@/components/landing";
-
-// TODO: Complete landing page and add impressive UI features
+import {
+  Hero,
+  Features,
+  CallToAction,
+  Footer,
+  ImageShowcase,
+} from "@/components/landing";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      {/* <Hero />
+      <Hero />
+      <ImageShowcase />
       <Features />
-      <CallToAction /> */}
+      <CallToAction />
+      <Footer />
     </div>
   );
 }

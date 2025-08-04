@@ -3,6 +3,7 @@
 import { MouseEvent, ReactNode, useEffect, useRef } from "react";
 import ModalHeader from "./modal-header";
 import { cn } from "@/lib/utils/cn";
+import useEscape from "@/hooks/use-escape";
 
 type ModalProps = {
   onClose: () => void;
@@ -20,19 +21,7 @@ export default function Modal({
   const modalRef = useRef<HTMLDialogElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [onClose]);
+  useEscape(onClose);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";

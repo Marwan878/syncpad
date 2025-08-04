@@ -35,6 +35,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SyncPad",
   description: "SyncPad is an online collaborative editor",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
