@@ -14,7 +14,7 @@ export default function CallToAction() {
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-6">
           <SignUpButton>
-            <button className="rounded-md bg-text-inverted px-6 py-3 text-sm font-semibold text-brand shadow-sm hover:bg-text-inverted/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-inverted transition-colors">
+            <button className="rounded-md bg-text-inverted px-6 py-3 text-sm font-semibold text-brand shadow-sm hover:bg-text-inverted/90 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-text-inverted transition-colors">
               Start Free Today
             </button>
           </SignUpButton>

@@ -37,6 +37,34 @@ const WORKSPACES_QUERY = `
     }
 `;
 
+const SHARED_WORKSPACES_QUERY = `
+    query SharedWorkspacesQuery($userId: String!) {
+      workspaces(where: { 
+        _and: [
+          { owner_id: { _neq: $userId } },
+          { _or: [
+            { allowed_viewers_ids: { _contains: [$userId] } },
+            { allowed_editors_ids: { _contains: [$userId] } },
+            { any_user_can_view: { _eq: true } },
+            { any_user_can_edit: { _eq: true } }
+          ]}
+        ]
+      }) {
+            id
+            name
+            description
+            pages_count
+            created_at
+            updated_at
+            owner_id
+            allowed_viewers_ids
+            allowed_editors_ids
+            any_user_can_edit
+            any_user_can_view
+      }
+    }
+`;
+
 const DELETE_WORKSPACE_AND_PAGES_MUTATION = `
   mutation DeleteWorkspaceAndPages($id: uuid!) {
     delete_workspace_and_pages(args: { _workspace_id: $id }) {
@@ -95,6 +123,14 @@ export class WorkspaceService {
     const data = await this.hasura.query<{
       workspaces: Workspace[];
     }>(WORKSPACES_QUERY, { userId });
+
+    return data.workspaces;
+  }
+
+  async getSharedWorkspacesByUserId(userId: string): Promise<Workspace[]> {
+    const data = await this.hasura.query<{
+      workspaces: Workspace[];
+    }>(SHARED_WORKSPACES_QUERY, { userId });
 
     return data.workspaces;
   }
