@@ -26,8 +26,8 @@ export default async function WorkspaceHeader({
 
   const workspace = await fetchWithAuth<Workspace>(
     {
-      token: token ?? "",
-      userId: userId ?? "",
+      token,
+      userId,
       relativeUrl: `/workspaces/${workspaceId}`,
     },
     {
@@ -44,7 +44,7 @@ export default async function WorkspaceHeader({
       <Button
         as={Link}
         href="/workspaces"
-        variant="ghost"
+        variant="icon"
         aria-label="Back to workspaces"
       >
         <ArrowLeft className="w-5 h-5" aria-hidden="true" />

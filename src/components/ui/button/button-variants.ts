@@ -15,6 +15,7 @@ export const buttonVariants: Record<ButtonVariant, string> = {
     "bg-state-error text-text-inverted hover:bg-red-700 active:bg-red-700 focus:ring-state-error shadow-sm",
   warning:
     "bg-state-warning text-text-primary hover:bg-yellow-500 active:bg-yellow-500 focus:ring-state-warning shadow-sm",
+  icon: "px-1 py-1 md:px-2 md:py-2 rounded-md text-text-secondary hover:bg-background-muted hover:text-text-primary active:bg-background-muted active:text-text-primary focus:ring-background-muted",
 };
 
 export const buttonSizes: Record<ButtonSize, string> = {

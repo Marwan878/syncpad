@@ -9,10 +9,6 @@ export async function GET(request: NextRequest) {
     const clerkClient = ClerkClient.getInstance();
     const userId = await clerkClient.authenticateRequest(request);
 
-    if (!userId) {
-      throw new ValidationError("User ID is required");
-    }
-
     // Get workspaces
     const workspaceService = WorkspaceService.getInstance();
     const workspaces = await workspaceService.getWorkspacesByUserId(userId);

@@ -25,11 +25,10 @@ const Button = <T extends ElementType>({
 
   const combinedClassName = [
     baseStyles,
-    variantClasses,
     sizeClasses,
+    variantClasses,
     isLoading ? loadingStyles : "",
     props.disabled || isLoading ? disabledStyles : "",
-    props.className,
   ]
     .filter(Boolean)
     .join(" ");

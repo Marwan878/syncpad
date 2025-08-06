@@ -27,8 +27,8 @@ export default function WorkspacesPage() {
       const token = await getToken();
       const workspaces = await fetchWithAuth<Workspace[]>(
         {
-          token: token ?? "",
-          userId: userId ?? "",
+          token,
+          userId,
           relativeUrl: "/workspaces",
         },
         {

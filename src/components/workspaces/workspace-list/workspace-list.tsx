@@ -1,4 +1,4 @@
-import WorkspaceCardSkeleton from "@/skeletons/workspaces/workspace-card";
+import WorkspaceCardSkeleton from "@/skeletons/workspace-card";
 import { Workspace } from "@/types/workspace";
 import EmptyWorkspaceMessage from "./empty-workspace-message";
 import WorkspaceCard from "./workspace-card/workspace-card";

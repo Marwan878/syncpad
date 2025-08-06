@@ -1,5 +1,5 @@
 import { Workspace } from "@/types/workspace";
-import { ForbiddenError } from "./error";
+import { ValidationError, ForbiddenError } from "./error";
 import { HasuraClient } from "./hasura-client";
 
 const WORKSPACE_QUERY = `
@@ -111,7 +111,11 @@ export class WorkspaceService {
     return WorkspaceService.instance;
   }
 
-  async getWorkspaceById(workspaceId: string): Promise<Workspace> {
+  async getWorkspaceById(workspaceId: string | undefined): Promise<Workspace> {
+    if (!workspaceId) {
+      throw new ValidationError("Workspace ID is required");
+    }
+
     const data = await this.hasura.query<{
       workspaces_by_pk: Workspace;
     }>(WORKSPACE_QUERY, { id: workspaceId });
@@ -212,10 +216,13 @@ export class WorkspaceService {
     }
   }
 
-  async updateWorkspace(
-    workspaceId: string,
-    updates: Partial<Omit<Workspace, "id" | "created_at" | "updated_at">>
-  ): Promise<void> {
+  async updateWorkspace({
+    workspaceId,
+    updates,
+  }: {
+    workspaceId?: string;
+    updates: Partial<Omit<Workspace, "id" | "created_at" | "updated_at">>;
+  }): Promise<void> {
     await this.hasura.query<void>(UPDATE_WORKSPACE_MUTATION, {
       id: workspaceId,
       updates: {
@@ -223,5 +230,15 @@ export class WorkspaceService {
         updated_at: new Date().toISOString(),
       },
     });
+  }
+
+  async checkUserCanModifyWorkspace(
+    userId: string,
+    workspaceId?: string
+  ): Promise<void> {
+    const workspace = await this.getWorkspaceById(workspaceId);
+    if (workspace.owner_id !== userId) {
+      throw new ForbiddenError("You are not the owner of this workspace");
+    }
   }
 }

@@ -38,8 +38,8 @@ export default function AddPageModal({
       const token = await getToken();
       const response = await fetchWithAuth(
         {
-          token: token ?? "",
-          userId: userId ?? "",
+          token,
+          userId,
           relativeUrl: `/workspaces/${workspaceId}/pages`,
         },
         {
@@ -64,7 +64,9 @@ export default function AddPageModal({
   return (
     <Modal onClose={onClose} title="Create New Page">
       <ModalBody>
-        <Label htmlFor="page-title">Page Title *</Label>
+        <Label htmlFor="page-title" className="mb-2">
+          Page Title *
+        </Label>
         <input
           type="text"
           id="page-title"

@@ -62,3 +62,31 @@ export async function DELETE(
     return handleError(error);
   }
 }
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ workspaceId?: string }> }
+) {
+  try {
+    const { workspaceId } = await params;
+
+    // Authentication
+    const clerkClient = ClerkClient.getInstance();
+    const userId = await clerkClient.authenticateRequest(request);
+
+    // Authorization
+    const workspaceService = WorkspaceService.getInstance();
+    await workspaceService.checkUserCanModifyWorkspace(userId, workspaceId);
+
+    // Patch workspace
+    const updatedWorkspace = await request.json();
+    await workspaceService.updateWorkspace({
+      workspaceId,
+      updates: updatedWorkspace,
+    });
+
+    return NextResponse.json(updatedWorkspace);
+  } catch (error) {
+    return handleError(error);
+  }
+}

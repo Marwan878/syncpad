@@ -8,7 +8,7 @@ export default function Label({ children, ...props }: Readonly<LabelProps>) {
     <label
       {...props}
       className={cn(
-        "block text-sm font-medium text-text-primary mb-2",
+        "block text-sm font-medium text-text-primary",
         props.className
       )}
     >
