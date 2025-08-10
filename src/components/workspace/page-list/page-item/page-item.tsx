@@ -10,7 +10,7 @@ type PageItemProps = {
 export default function PageItem({ page }: Readonly<PageItemProps>) {
   return (
     <Link
-      href={`/pages/${page.id}`}
+      href={`/workspaces/${page.workspace_id}/pages/${page.id}`}
       className={`flex flex-col gap-y-4 items-center`}
     >
       <div className="flex items-center justify-center w-35 h-40 cursor-pointer bg-white hover:shadow-sm transition-all duration-200 rounded-lg border border-gray-200 p-4">

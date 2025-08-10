@@ -68,7 +68,7 @@ export async function POST(
       id: crypto.randomUUID(),
       title: title.trim(),
       created_at: new Date().toISOString(),
-      workspace_id: workspaceId,
+      workspace_id: workspace.id,
       order: workspace.pages_count + 1,
     };
 

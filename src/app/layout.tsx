@@ -1,11 +1,6 @@
 // Clerk
 import { ClerkProvider } from "@clerk/nextjs";
 
-// Uploadthing
-import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
-import { extractRouterConfig } from "uploadthing/server";
-import { ourFileRouter } from "./api/uploadthing/core";
-
 // Next
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -21,6 +16,7 @@ import Navbar from "@/components/main-layout/navbar";
 
 // Tanstack Query
 import ReactQueryProvider from "@/components/providers/react-query-provider";
+import { EdgeStoreProvider } from "@/lib/edgestore";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,19 +48,12 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <ReactQueryProvider>
-            <NextSSRPlugin
-              /**
-               * The `extractRouterConfig` will extract **only** the route configs
-               * from the router to prevent additional information from being
-               * leaked to the client. The data passed to the client is the same
-               * as if you were to fetch `/api/uploadthing` directly.
-               */
-              routerConfig={extractRouterConfig(ourFileRouter)}
-            />
-            <Toaster />
-            <Navbar />
+            <EdgeStoreProvider>
+              <Toaster />
+              <Navbar />
 
-            <main>{children}</main>
+              <main>{children}</main>
+            </EdgeStoreProvider>
           </ReactQueryProvider>
         </body>
       </html>

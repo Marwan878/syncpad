@@ -33,7 +33,7 @@ export default function PageList({ workspaceId }: Readonly<PageListProps>) {
     queryFn: async () => {
       const token = await getToken();
       const pages = await fetchWithAuth<Page[]>({
-        token: token ?? "",
+        token,
         userId: userId ?? "",
         relativeUrl: `/workspaces/${workspaceId}/pages`,
       });
@@ -52,8 +52,8 @@ export default function PageList({ workspaceId }: Readonly<PageListProps>) {
     queryFn: async () => {
       const token = await getToken();
       const workspace = await fetchWithAuth<Workspace>({
-        token: token ?? "",
-        userId: userId ?? "",
+        token,
+        userId,
         relativeUrl: `/workspaces/${workspaceId}`,
       });
 

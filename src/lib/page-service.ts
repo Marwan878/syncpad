@@ -8,6 +8,7 @@ const PAGES_QUERY = `
             title
             order
             updated_at
+            workspace_id
         }
     }
 `;

@@ -1,10 +1,8 @@
-import React from "react";
 import Image from "next/image";
 import { Container } from "../ui";
-import { Circle } from "lucide-react";
-import { cn } from "@/lib/utils/cn";
+import FloatingIndicator from "../ui/floating-indicator";
 
-// TODO: Add an actual video and move FloatingElement to a separate file unless you didn't come here and removed it elsewhere
+// TODO: Add an actual video
 
 export default function ImageShowcase() {
   return (
@@ -29,42 +27,16 @@ export default function ImageShowcase() {
           priority
         />
 
-        <FloatingElement
+        <FloatingIndicator
           text="Live Collaboration"
-          className="left-4 top-4 sm:left-6 sm:top-6 text-accent"
+          className="left-4 top-4 sm:left-6 sm:top-6 text-accent absolute"
         />
 
-        <FloatingElement
+        <FloatingIndicator
           text="Auto-saved"
-          className="right-4 top-4 sm:right-6 sm:top-6 text-brand"
+          className="right-4 top-4 sm:right-6 sm:top-6 text-brand absolute"
         />
       </div>
     </Container>
-  );
-}
-
-function FloatingElement({
-  text,
-  className,
-}: {
-  text: string;
-  className?: string;
-}) {
-  return (
-    <div
-      className={cn(
-        "absolute rounded-lg bg-white/90 backdrop-blur-sm px-3 py-2 shadow-lg ring-1 ring-background-muted/10 flex items-center space-x-2",
-        className
-      )}
-    >
-      <Circle
-        fill="currentColor"
-        className="text-inherit animate-pulse size-2"
-        aria-hidden="true"
-      />
-      <span className="text-xs font-medium text-text-primary select-none">
-        {text}
-      </span>
-    </div>
   );
 }

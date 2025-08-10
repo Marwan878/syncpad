@@ -19,7 +19,7 @@ export default function OptionsMenu({
   return (
     <ul
       ref={menuRef}
-      className="absolute top-10 right-0 w-48 bg-white rounded-lg shadow-lg border border-gray-200 px-2 py-2 space-y-1"
+      className="absolute top-10 right-0 w-48 bg-white rounded-lg shadow-lg border border-gray-200 px-2 py-2 space-y-1 animate-fade-in"
     >
       <li>
         <button

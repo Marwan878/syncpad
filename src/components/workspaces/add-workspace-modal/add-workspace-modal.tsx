@@ -63,7 +63,9 @@ export default function AddWorkspaceModal({
         <div className="space-y-4">
           {/* Workspace Name */}
           <div>
-            <Label htmlFor="workspace-name">Workspace Name *</Label>
+            <Label htmlFor="workspace-name" className="mb-2">
+              Workspace Name *
+            </Label>
             <input
               type="text"
               id="workspace-name"
@@ -79,7 +81,7 @@ export default function AddWorkspaceModal({
 
           {/* Workspace Description */}
           <div>
-            <Label htmlFor="workspace-description">
+            <Label htmlFor="workspace-description" className="mb-2">
               Description (optional)
             </Label>
             <textarea

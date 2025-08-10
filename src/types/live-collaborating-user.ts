@@ -9,3 +9,18 @@ export type LiveCollaboratingUser = {
   cursor_x: number;
   cursor_y: number;
 };
+
+export type CollaborationUser = {
+  name: string;
+  color: string;
+  cursor?: {
+    anchor: number;
+    head: number;
+    position: {
+      x: number;
+      y: number;
+      height: number;
+      width: number;
+    };
+  };
+};

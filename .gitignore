@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+# y-websocket-server
+/y-websocket-server/dist
+/y-websocket-server/node_modules
+/y-websocket-server/tmp
+/y-websocket-server/dbDir
