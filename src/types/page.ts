@@ -5,4 +5,9 @@ export type Page = {
   created_at: string;
   updated_at?: string;
   order: number;
+  content: Uint8Array<ArrayBufferLike>;
+};
+
+export type PageWithByte64Content = Omit<Page, "content"> & {
+  content?: string;
 };

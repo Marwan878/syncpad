@@ -13,6 +13,8 @@ export default async function WorkspacePage({
 }>) {
   const { workspaceId } = await params;
 
+  // TODO: Make this route protected
+
   return (
     <div className="min-h-screen bg-background-light mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       <Suspense fallback={<WorkspaceHeaderSkeleton />}>

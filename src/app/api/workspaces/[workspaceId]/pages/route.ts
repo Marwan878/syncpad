@@ -70,6 +70,7 @@ export async function POST(
       created_at: new Date().toISOString(),
       workspace_id: workspace.id,
       order: workspace.pages_count + 1,
+      content: new Uint8Array(),
     };
 
     const pageService = PageService.getInstance();

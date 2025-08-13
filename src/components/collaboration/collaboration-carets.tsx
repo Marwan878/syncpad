@@ -8,7 +8,7 @@ import Caret from "./caret";
 
 interface CollaborationCaretsProps {
   editor: Editor | null;
-  provider: WebsocketProvider;
+  provider: WebsocketProvider | null;
 }
 
 export function CollaborationCarets({
@@ -83,7 +83,7 @@ export function CollaborationCarets({
     };
   }, [editor, provider]);
 
-  if (!editor) return null;
+  if (!editor || !provider) return null;
 
   return (
     <>

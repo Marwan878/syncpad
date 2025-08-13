@@ -2,10 +2,12 @@
 
 // UI
 import PageListSkeleton from "@/skeletons/workspace/page-list";
-import EmptyMessage from "./empty-message/empty-message";
-import PageItem from "./page-item/page-item";
 import AddPageModal from "./add-page-modal";
 import CreatePageButton from "./create-page-button";
+import DeletePageModal from "./delete-page-modal";
+import EmptyMessage from "./empty-message/empty-message";
+import PageGrid from "./page-grid";
+import PageItem from "./page-item/page-item";
 
 // Lib
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
@@ -18,7 +20,6 @@ import { Workspace } from "@/types/workspace";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import PageGrid from "./page-grid";
 
 type PageListProps = {
   workspaceId: string;
@@ -26,6 +27,8 @@ type PageListProps = {
 
 export default function PageList({ workspaceId }: Readonly<PageListProps>) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [pageToBeDeleted, setPageToBeDeleted] = useState<Page | null>(null);
   const { getToken, userId, isLoaded: isAuthLoaded } = useAuth();
 
   const { data: pages, isLoading: isLoadingPages } = useQuery({
@@ -34,7 +37,7 @@ export default function PageList({ workspaceId }: Readonly<PageListProps>) {
       const token = await getToken();
       const pages = await fetchWithAuth<Page[]>({
         token,
-        userId: userId ?? "",
+        userId,
         relativeUrl: `/workspaces/${workspaceId}/pages`,
       });
 
@@ -87,8 +90,14 @@ export default function PageList({ workspaceId }: Readonly<PageListProps>) {
       )}
       {pages.length > 0 && (
         <PageGrid>
-          {pages.map((page) => (
-            <PageItem key={page.id} page={page} />
+          {pages.map((page, index) => (
+            <PageItem
+              key={page.id}
+              page={page}
+              index={index}
+              setIsDeleteModalOpen={setIsDeleteModalOpen}
+              setPageToBeDeleted={setPageToBeDeleted}
+            />
           ))}
           {canEdit && (
             <CreatePageButton setIsAddModalOpen={setIsAddModalOpen} />
@@ -100,6 +109,17 @@ export default function PageList({ workspaceId }: Readonly<PageListProps>) {
         <AddPageModal
           onClose={() => setIsAddModalOpen(false)}
           workspaceId={workspaceId}
+        />
+      )}
+
+      {isDeleteModalOpen && (
+        <DeletePageModal
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setPageToBeDeleted(null);
+          }}
+          workspaceId={workspaceId}
+          page={pageToBeDeleted}
         />
       )}
     </div>

@@ -10,6 +10,7 @@ import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button";
 import { LinkButton, LinkPopover } from "@/components/tiptap-ui/link-popover";
 import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu";
 import { MarkButton } from "@/components/tiptap-ui/mark-button";
+import ShareDropdownMenu from "@/components/tiptap-ui/share-dropdown-menu/share-dropdown-menu";
 import { TableButton } from "@/components/tiptap-ui/table-button";
 import { TextAlignButton } from "@/components/tiptap-ui/text-align-button";
 import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button";
@@ -21,13 +22,18 @@ import {
   ToolbarSeparator,
 } from "@/components/tiptap-ui-primitive/toolbar";
 
+// --- Types ---
+import { Editor } from "@tiptap/react";
+
 type MainToolbarContentProps = {
+  editor: Editor;
   onHighlighterClick: () => void;
   onLinkClick: () => void;
   isMobile: boolean;
 };
 
 export default function MainToolbarContent({
+  editor,
   onHighlighterClick,
   onLinkClick,
   isMobile,
@@ -89,10 +95,18 @@ export default function MainToolbarContent({
 
       <ToolbarGroup>
         <ImageUploadButton text="Add" />
-        <TableButton />
+        <TableButton text="Insert" />
       </ToolbarGroup>
 
       <Spacer />
+
+      <ToolbarGroup>
+        <ShareDropdownMenu
+          pageTitle={"%page title%"}
+          portal={isMobile}
+          providedEditor={editor}
+        />
+      </ToolbarGroup>
 
       {isMobile && <ToolbarSeparator />}
 

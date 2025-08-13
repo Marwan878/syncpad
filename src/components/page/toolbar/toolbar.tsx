@@ -1,3 +1,5 @@
+"use client";
+
 // --- UI Primitives ---
 import { Toolbar as ToolbarPrimitive } from "@/components/tiptap-ui-primitive/toolbar";
 
@@ -47,6 +49,7 @@ export default function Toolbar({
     >
       {mobileView === "main" ? (
         <MainToolbarContent
+          editor={editor}
           onHighlighterClick={() => setMobileView("highlighter")}
           onLinkClick={() => setMobileView("link")}
           isMobile={isMobile}
