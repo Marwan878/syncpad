@@ -1,19 +1,25 @@
 import { cn } from "@/lib/utils/cn";
 import { MousePointer2 } from "lucide-react";
+import { CSSProperties } from "react";
 
 type PointerProps = {
   className?: string;
   username?: string;
   inverted?: boolean;
+  style?: CSSProperties;
 };
 
 export default function Pointer({
   className,
   username,
   inverted,
+  style,
 }: Readonly<PointerProps>) {
   return (
-    <div className={cn("absolute flex flex-col z-100", className)}>
+    <div
+      className={cn("absolute flex flex-col z-100", className)}
+      style={style}
+    >
       <MousePointer2
         className={cn("size-7 -mb-2", inverted && "rotate-y-180 self-end")}
         fill="currentColor"

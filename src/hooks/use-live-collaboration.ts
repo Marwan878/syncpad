@@ -1,16 +1,26 @@
+// --- Lib ---
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import uint8ArrayToBase64 from "@/lib/utils/uint8-array-to-base-64";
-import { User } from "@/types/user";
+
+// --- Hooks ---
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+// --- Yjs ---
 import { WebsocketProvider } from "y-websocket";
+import { IndexeddbPersistence } from "y-indexeddb";
 import * as Y from "yjs";
+
+// --- Types ---
+import { User } from "@/types/user";
+import { ConnectionStatus } from "@/types/page";
+import { CollaborationUser } from "@/types/live-collaborating-user";
 
 const AUTO_SAVE_INTERVAL_IN_MS = 5_000;
 
 const ydoc = new Y.Doc();
-const initialUser = {
+const initialUser: CollaborationUser = {
   name: "Loading...",
   color: "#" + Math.floor(Math.random() * 0xffffff).toString(16),
   cursor: {
@@ -22,6 +32,7 @@ const initialUser = {
       height: 0,
       width: 0,
     },
+    type: "mouse",
   },
 };
 
@@ -30,6 +41,9 @@ export default function useLiveCollaboration(
   pageId: string
 ) {
   const { getToken, userId, isLoaded: isAuthLoaded } = useAuth();
+  const [status, setStatus] = useState<ConnectionStatus>("disconnected");
+
+  const persistence = new IndexeddbPersistence(pageId, ydoc);
 
   const { data: user } = useQuery({
     queryKey: ["user", userId],
@@ -57,6 +71,30 @@ export default function useLiveCollaboration(
     });
     return p;
   }, [pageId, user?.name]);
+
+  useEffect(() => {
+    const setOffline = () => {
+      setStatus("disconnected");
+    };
+
+    const _setStatus = (event: { status: ConnectionStatus }) => {
+      if (!navigator.onLine) {
+        setOffline();
+        return;
+      }
+
+      setStatus(event.status);
+    };
+
+    provider?.on("status", _setStatus);
+
+    window.addEventListener("offline", setOffline);
+
+    return () => {
+      provider?.off("status", _setStatus);
+      window.removeEventListener("offline", setOffline);
+    };
+  }, [provider]);
 
   // Auto save
   useEffect(() => {
@@ -101,5 +139,5 @@ export default function useLiveCollaboration(
     };
   }, [provider]);
 
-  return { ydoc, provider };
+  return { ydoc, provider, status };
 }

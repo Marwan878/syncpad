@@ -1,8 +1,5 @@
 "use client";
 
-// TODO: Add status: syncing/offline/synced
-// TODO: Handle offline state
-// TODO: Add live cursors
 // TODO: End-to-End Encryption (optional advanced)
 // TODO: Encrypt content client-side for privacy.
 // TODO: Decrypt only on the client, backend stores encrypted blobs.
@@ -25,21 +22,18 @@ import { useState } from "react";
 import "@/components/tiptap-templates/simple/simple-editor.scss";
 
 // --- Components ---
-import { CollaborationCarets } from "@/components/collaboration/collaboration-carets";
+import CollaborationIndicators from "@/components/collaboration/collaboration-indicators";
 import ConfirmDeleteTableModal from "@/components/page/editor/confirm-delete-table-modal";
 import TableMenu from "@/components/page/editor/table-menu";
 import ForbiddenMessage from "@/components/page/forbidden-message";
 import Toolbar from "@/components/page/toolbar/toolbar";
+import StatusIndicator from "@/components/ui/status-indicator";
 
 // --- Utils ---
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 
 // --- Types ---
-import { Page as PageType } from "@/types/page";
 import { Workspace } from "@/types/workspace";
-
-// --- Yjs ---
-import * as Y from "yjs";
 
 export default function Page() {
   const { isMobile, mobileView, setMobileView } = useMobileView();
@@ -53,14 +47,11 @@ export default function Page() {
 
   const { getToken, userId, isLoaded: isAuthLoaded } = useAuth();
 
-  const { ydoc, provider } = useLiveCollaboration(workspaceId, pageId);
+  const { ydoc, provider, status } = useLiveCollaboration(workspaceId, pageId);
 
   const editor = useConfiguredEditor(ydoc);
 
-  const {
-    data: { canEdit, canView },
-    isLoading: isPermissionsLoading,
-  } = useQuery({
+  const { data: accessData, isLoading: isPermissionsLoading } = useQuery({
     queryKey: ["workspace", workspaceId],
     queryFn: async () => {
       const token = await getToken();
@@ -87,30 +78,11 @@ export default function Page() {
       return { canEdit, canView };
     },
     enabled: isAuthLoaded,
-    initialData: { canEdit: false, canView: false },
-  });
-
-  useQuery({
-    queryKey: ["page", pageId],
-    queryFn: async () => {
-      const token = await getToken();
-      const page = await fetchWithAuth<PageType>({
-        relativeUrl: `/workspaces/${workspaceId}/pages/${pageId}`,
-        token,
-        userId,
-      });
-
-      const binary = new Uint8Array(page.content);
-      Y.applyUpdate(ydoc, binary);
-
-      return page;
-    },
-    enabled: isAuthLoaded && (canEdit || canView),
   });
 
   if (!editor || isPermissionsLoading || !isAuthLoaded) return null;
 
-  if (!canView && !canEdit) return <ForbiddenMessage />;
+  if (!accessData?.canView && !accessData?.canEdit) return <ForbiddenMessage />;
 
   return (
     <EditorContext.Provider value={{ editor }}>
@@ -125,12 +97,12 @@ export default function Page() {
           editor={editor}
           role="presentation"
           className="simple-editor-content"
-          contentEditable={canEdit}
+          contentEditable={accessData?.canEdit}
         />
-        {editor && (
-          <CollaborationCarets
+        {editor && accessData?.canEdit && (
+          <CollaborationIndicators
             editor={editor}
-            provider={canEdit ? provider : null}
+            provider={accessData?.canEdit ? provider : null}
           />
         )}
       </div>
@@ -149,6 +121,8 @@ export default function Page() {
           )}
         </>
       )}
+
+      <StatusIndicator status={status} className="fixed bottom-3 right-3" />
     </EditorContext.Provider>
   );
 }

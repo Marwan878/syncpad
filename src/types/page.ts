@@ -11,3 +11,5 @@ export type Page = {
 export type PageWithByte64Content = Omit<Page, "content"> & {
   content?: string;
 };
+
+export type ConnectionStatus = "connected" | "disconnected" | "connecting";

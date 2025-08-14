@@ -13,14 +13,17 @@ export type LiveCollaboratingUser = {
 export type CollaborationUser = {
   name: string;
   color: string;
-  cursor?: {
-    anchor: number;
-    head: number;
-    position: {
-      x: number;
-      y: number;
-      height: number;
-      width: number;
-    };
+  cursor: Cursor;
+};
+
+type Cursor = {
+  anchor: number;
+  head: number;
+  position: {
+    x: number;
+    y: number;
+    height: number;
+    width: number;
   };
+  type: "caret" | "mouse";
 };

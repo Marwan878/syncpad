@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Container } from "../ui";
-import FloatingIndicator from "../ui/floating-indicator";
+import FloatingIndicator from "../ui/status-indicator";
 
 // TODO: Add an actual video
 
