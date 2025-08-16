@@ -43,6 +43,7 @@
     "@uploadthing/react": "^7.3.2",
     "clsx": "^2.1.1",
     "graphql": "^16.11.0",
+    "ioredis": "^5.7.0",
     "jspdf": "^3.0.1",
     "lodash.throttle": "^4.1.1",
     "lucide-react": "^0.525.0",

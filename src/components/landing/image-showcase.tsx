@@ -28,13 +28,8 @@ export default function ImageShowcase() {
         />
 
         <FloatingIndicator
-          text="Live Collaboration"
-          className="left-4 top-4 sm:left-6 sm:top-6 text-accent absolute"
-        />
-
-        <FloatingIndicator
-          text="Auto-saved"
-          className="right-4 top-4 sm:right-6 sm:top-6 text-brand absolute"
+          status="connected"
+          className="end-4 bottom-4 sm:end-6 sm:bottom-6 text-accent absolute"
         />
       </div>
     </Container>

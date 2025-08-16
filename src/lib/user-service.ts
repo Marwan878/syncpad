@@ -31,6 +31,20 @@ const USER_SEARCH_QUERY = `
   }
 `;
 
+const CREATE_USER = `
+  mutation CreateUser($id: String!, $name: String!, $email: String, $avatar_url: String!, $created_at: timestamptz!) {
+    insert_users_one(object: {
+      id: $id,
+      name: $name,
+      email: $email,
+      avatar_url: $avatar_url,
+      created_at: $created_at
+    }) {
+      id
+    }
+  }
+`;
+
 export class UserService {
   private static instance: UserService;
   private readonly hasura = HasuraClient.getInstance();
@@ -62,5 +76,13 @@ export class UserService {
     }>(USER_SEARCH_QUERY, { query: `%${query}%` });
 
     return data.users;
+  }
+
+  async createUser(user: User): Promise<User> {
+    const data = await this.hasura.query<{
+      insert_users_one: User;
+    }>(CREATE_USER, { user });
+
+    return data.insert_users_one;
   }
 }

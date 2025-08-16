@@ -34,4 +34,7 @@ export const config = {
       process.env.NEXT_PUBLIC_API_URL
     ),
   },
+  redis: {
+    url: validateEnvironmentVariable("REDIS_URL", process.env.REDIS_URL),
+  },
 } as const;

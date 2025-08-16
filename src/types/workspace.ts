@@ -11,3 +11,5 @@ export type Workspace = {
   any_user_can_edit: boolean;
   any_user_can_view: boolean;
 };
+
+export type Permission = "edit" | "view" | "delete";

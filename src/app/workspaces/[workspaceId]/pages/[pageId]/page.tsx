@@ -6,6 +6,7 @@
 // TODO: Scalable architecture for multiple users
 // TODO: Caching using Redis
 // TODO: Use GraphQL for frontend
+// TODO: Comprehensive testing
 
 import { EditorContent, EditorContext } from "@tiptap/react";
 
@@ -61,7 +62,7 @@ export default function Page() {
         userId,
       });
 
-      // TODO: Change this (Make the backend decide the permissions not the front end)
+      // TODO: Change this (Make the backend decide the permissions not the frontend)
       const canEdit = !!(
         userId &&
         (workspace.owner_id === userId ||

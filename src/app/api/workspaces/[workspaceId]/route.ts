@@ -1,6 +1,8 @@
 import { ClerkClient } from "@/lib/clerk-client";
 import { handleError, ValidationError } from "@/lib/error";
+import { redis } from "@/lib/redis";
 import { WorkspaceService } from "@/lib/workspace-service";
+import { Workspace } from "@/types/workspace";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -11,13 +13,27 @@ export async function GET(
     // Data validation
     const { workspaceId } = await params;
 
+    // TODO: Delegate this check to other functions
     if (!workspaceId) {
       throw new ValidationError("Workspace ID is required");
     }
 
-    // Get workspace
-    const workspaceService = WorkspaceService.getInstance();
-    const workspace = await workspaceService.getWorkspaceById(workspaceId);
+    // Get cached workspace if it exists
+    const cacheKey = `workspace:${workspaceId}`;
+    const stringifiedWorkspace = await redis.get(cacheKey);
+
+    // Prepare the workspace
+    let workspace: Workspace;
+    if (stringifiedWorkspace) {
+      workspace = JSON.parse(stringifiedWorkspace);
+    } else {
+      // Get workspace
+      const workspaceService = WorkspaceService.getInstance();
+      workspace = await workspaceService.getWorkspaceById(workspaceId);
+
+      // Cache workspace for 24 hours
+      await redis.set(cacheKey, JSON.stringify(workspace), "EX", 60 * 60 * 24);
+    }
 
     if (!workspace.any_user_can_view) {
       // Authentication
@@ -25,6 +41,7 @@ export async function GET(
       const userId = await clerkClient.authenticateRequest(request);
 
       // Authorization
+      const workspaceService = WorkspaceService.getInstance();
       workspaceService.checkUserCanView(workspaceId, userId);
     }
 
@@ -57,6 +74,9 @@ export async function DELETE(
     // Delete workspace
     await workspaceService.deleteWorkspaceAndPagesById(workspaceId);
 
+    // Revalidate workspace cache
+    await redis.del(`workspace:${workspaceId}`);
+
     return NextResponse.json({ message: "Workspace deleted successfully" });
   } catch (error) {
     return handleError(error);
@@ -84,6 +104,9 @@ export async function PATCH(
       workspaceId,
       updates: updatedWorkspace,
     });
+
+    // Revalidate workspace cache
+    await redis.del(`workspace:${workspaceId}`);
 
     return NextResponse.json(updatedWorkspace);
   } catch (error) {

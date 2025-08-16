@@ -1,6 +1,7 @@
 import { ClerkClient } from "@/lib/clerk-client";
 import { handleError, ValidationError } from "@/lib/error";
 import { PageService } from "@/lib/page-service";
+import { redis } from "@/lib/redis";
 import { WorkspaceService } from "@/lib/workspace-service";
 import { Page } from "@/types/page";
 import { NextRequest, NextResponse } from "next/server";
@@ -12,6 +13,7 @@ export async function GET(
   try {
     const { workspaceId } = await params;
 
+    // TODO: Delegate this check to other functions
     if (!workspaceId) {
       throw new ValidationError("Workspace ID is required");
     }
@@ -20,12 +22,23 @@ export async function GET(
     const clerkClient = ClerkClient.getInstance();
     const userId = await clerkClient.authenticateRequest(request);
 
+    // Return cached pages if they exist
+    const cacheKey = `pages:${workspaceId}`;
+    const cachedPages = await redis.get(cacheKey);
+
+    if (cachedPages) {
+      return NextResponse.json(JSON.parse(cachedPages));
+    }
+
     const workspaceService = WorkspaceService.getInstance();
     workspaceService.checkUserCanView(workspaceId, userId);
 
     // Get pages
     const pageService = PageService.getInstance();
     const pages = await pageService.getPagesByWorkspaceId(workspaceId);
+
+    // Cache pages for 24 hours
+    await redis.set(cacheKey, JSON.stringify(pages), "EX", 60 * 60 * 24);
 
     return NextResponse.json(pages);
   } catch (error) {
@@ -40,6 +53,7 @@ export async function POST(
   try {
     const { workspaceId } = await params;
 
+    // TODO: Delegate this check to other functions
     if (!workspaceId) {
       throw new ValidationError("Workspace ID is required");
     }
@@ -77,6 +91,9 @@ export async function POST(
     const page = await pageService.createPageAndIncrementWorkspacePagesCount(
       newPage
     );
+
+    // Revalidate pages cache
+    await redis.del(`pages:${workspaceId}`);
 
     return NextResponse.json(page, { status: 201 });
   } catch (error) {

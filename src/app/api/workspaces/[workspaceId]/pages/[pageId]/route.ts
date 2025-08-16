@@ -9,11 +9,7 @@ export async function PATCH(
   { params }: { params: Promise<{ workspaceId?: string; pageId?: string }> }
 ) {
   try {
-    const { workspaceId, pageId } = await params;
-
-    if (!workspaceId) {
-      throw new ValidationError("Workspace ID is required");
-    }
+    const { pageId } = await params;
 
     if (!pageId) {
       throw new ValidationError("Page ID is required");
