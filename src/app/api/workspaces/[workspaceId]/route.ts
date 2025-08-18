@@ -72,10 +72,15 @@ export async function DELETE(
     await workspaceService.checkUserCanDelete(workspaceId, userId);
 
     // Delete workspace
-    await workspaceService.deleteWorkspaceAndPagesById(workspaceId);
+    const deletedWorkspace = await workspaceService.deleteWorkspaceAndPagesById(
+      workspaceId
+    );
 
-    // Revalidate workspace cache
+    // Invalidate workspace cache
     await redis.del(`workspace:${workspaceId}`);
+
+    // Invalidate workspaces cache
+    await redis.del(`workspaces:${deletedWorkspace.owner_id}`);
 
     return NextResponse.json({ message: "Workspace deleted successfully" });
   } catch (error) {

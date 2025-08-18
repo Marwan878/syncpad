@@ -4,14 +4,17 @@
 // TODO: Encrypt content client-side for privacy.
 // TODO: Decrypt only on the client, backend stores encrypted blobs.
 // TODO: Scalable architecture for multiple users
-// TODO: Caching using Redis
 // TODO: Use GraphQL for frontend
 // TODO: Comprehensive testing
+
+import "@/styles/_keyframe-animations.scss";
+import "@/styles/_variables.scss";
 
 import { EditorContent, EditorContext } from "@tiptap/react";
 
 // --- Hooks ---
 import useConfiguredEditor from "@/hooks/use-configured-editor";
+import useCustomCursor from "@/hooks/use-custom-cursor";
 import useLiveCollaboration from "@/hooks/use-live-collaboration";
 import useMobileView from "@/hooks/use-mobile-view";
 import { useAuth } from "@clerk/nextjs";
@@ -28,6 +31,7 @@ import ConfirmDeleteTableModal from "@/components/page/editor/confirm-delete-tab
 import TableMenu from "@/components/page/editor/table-menu";
 import ForbiddenMessage from "@/components/page/forbidden-message";
 import Toolbar from "@/components/page/toolbar/toolbar";
+import Pointer from "@/components/ui/pointer";
 import StatusIndicator from "@/components/ui/status-indicator";
 
 // --- Utils ---
@@ -35,6 +39,9 @@ import { fetchWithAuth } from "@/lib/fetch-with-auth";
 
 // --- Types ---
 import { Workspace } from "@/types/workspace";
+
+// --- React ---
+import { createPortal } from "react-dom";
 
 export default function Page() {
   const { isMobile, mobileView, setMobileView } = useMobileView();
@@ -49,8 +56,6 @@ export default function Page() {
   const { getToken, userId, isLoaded: isAuthLoaded } = useAuth();
 
   const { ydoc, provider, status } = useLiveCollaboration(workspaceId, pageId);
-
-  const editor = useConfiguredEditor(ydoc);
 
   const { data: accessData, isLoading: isPermissionsLoading } = useQuery({
     queryKey: ["workspace", workspaceId],
@@ -81,6 +86,10 @@ export default function Page() {
     enabled: isAuthLoaded,
   });
 
+  const editor = useConfiguredEditor(ydoc, accessData?.canEdit ?? false);
+
+  const { cursorRef, toolbarRef, isCursorVisible } = useCustomCursor();
+
   if (!editor || isPermissionsLoading || !isAuthLoaded) return null;
 
   if (!accessData?.canView && !accessData?.canEdit) return <ForbiddenMessage />;
@@ -92,13 +101,13 @@ export default function Page() {
         isMobile={isMobile}
         mobileView={mobileView}
         setMobileView={setMobileView}
+        ref={toolbarRef}
       />
       <div className="relative">
         <EditorContent
           editor={editor}
           role="presentation"
           className="simple-editor-content"
-          contentEditable={accessData?.canEdit}
         />
         {editor && accessData?.canEdit && (
           <CollaborationIndicators
@@ -124,6 +133,14 @@ export default function Page() {
       )}
 
       <StatusIndicator status={status} className="fixed bottom-3 right-3" />
+      {isCursorVisible &&
+        createPortal(
+          <Pointer
+            wrapperClassName="pointer-events-none text-brand fixed"
+            ref={cursorRef}
+          />,
+          document.body
+        )}
     </EditorContext.Provider>
   );
 }

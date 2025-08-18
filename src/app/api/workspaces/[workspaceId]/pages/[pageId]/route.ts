@@ -1,6 +1,7 @@
 import { ClerkClient } from "@/lib/clerk-client";
 import { handleError, ValidationError } from "@/lib/error";
 import { PageService } from "@/lib/page-service";
+import { redis } from "@/lib/redis";
 import { WorkspaceService } from "@/lib/workspace-service";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -71,6 +72,7 @@ export async function DELETE(
   try {
     const { workspaceId, pageId } = await params;
 
+    // TODO: Delegate this check to other functions
     if (!workspaceId) {
       throw new ValidationError("Workspace ID is required");
     }
@@ -91,6 +93,15 @@ export async function DELETE(
     // Transaction: Delete page + decrement pages count for the workspace + reorder pages
     const deletedPage =
       await pageService.deletePageAndDecrementPagesCountAndReorder(pageId);
+
+    // Invalidate cache
+    await redis.del(`pages:${workspaceId}`);
+    await redis.del(`workspace:${workspaceId}`);
+
+    // Invalidate workspace cache
+    const workspaceService = WorkspaceService.getInstance();
+    const workspace = await workspaceService.getWorkspaceById(workspaceId);
+    await redis.del(`workspaces:${workspace.owner_id}`);
 
     return NextResponse.json(deletedPage);
   } catch (error) {

@@ -4,9 +4,10 @@ import { createPortal } from "react-dom";
 
 type CaretProps = {
   user: CollaborationUser;
+  className?: string;
 };
 
-export default function Caret({ user }: Readonly<CaretProps>) {
+export default function Caret({ user, className }: Readonly<CaretProps>) {
   if (!user.cursor) return null;
 
   return createPortal(

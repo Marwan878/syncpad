@@ -97,7 +97,7 @@ export default function DeleteWorkspaceModal({
         </Button>
 
         <Button
-          onClick={deleteWorkspace}
+          onClick={() => deleteWorkspace()}
           disabled={isDeleting || !isLoaded}
           variant="error"
         >

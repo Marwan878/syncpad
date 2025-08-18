@@ -29,7 +29,7 @@ export default function DeletePageModal({
     }
   };
 
-  const hasContent = page.content && page.content.trim().length > 0;
+  const hasContent = page.content && page.content.length > 0;
 
   return (
     <Modal onClose={handleClose} title="Delete Page">

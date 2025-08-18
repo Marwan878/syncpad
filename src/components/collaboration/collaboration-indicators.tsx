@@ -53,36 +53,52 @@ export default function CollaborationIndicators({
   useEffect(() => {
     if (!editor || !provider) return;
 
+    let updateTimeout: NodeJS.Timeout;
+
     const updateLocalCursor = () => {
-      const { from, to } = editor.state.selection;
+      // Clear any pending updates to avoid excessive calls
+      clearTimeout(updateTimeout);
 
-      const isText = editor.state.doc.resolve(from).parent.isTextblock;
+      // Delay the cursor update slightly to avoid conflicts with ongoing transactions
+      updateTimeout = setTimeout(() => {
+        try {
+          const { from, to } = editor.state.selection;
 
-      const localState = provider.awareness.getLocalState();
-      if (!localState) return;
+          const isText = editor.state.doc.resolve(from).parent.isTextblock;
 
-      const user = localState.user as CollaborationUser;
+          const localState = provider.awareness.getLocalState();
+          if (!localState) return;
 
-      const newUser: CollaborationUser = {
-        ...user,
-        cursor: {
-          anchor: from,
-          head: to,
-          position: {
-            x: editor.view.coordsAtPos(from).left + window.scrollX,
-            y: editor.view.coordsAtPos(from).top + window.scrollY,
-            height:
-              editor.view.coordsAtPos(from).bottom -
-              editor.view.coordsAtPos(from).top,
-            width:
-              editor.view.coordsAtPos(to).left -
-              editor.view.coordsAtPos(from).left,
-          },
-          type: isText ? "caret" : "mouse",
-        },
-      };
+          const user = localState.user as CollaborationUser;
 
-      provider.awareness.setLocalStateField("user", newUser);
+          const newUser: CollaborationUser = {
+            ...user,
+            cursor: {
+              anchor: from,
+              head: to,
+              position: {
+                x: editor.view.coordsAtPos(from).left + window.scrollX,
+                y: editor.view.coordsAtPos(from).top + window.scrollY,
+                height:
+                  editor.view.coordsAtPos(from).bottom -
+                  editor.view.coordsAtPos(from).top,
+                width:
+                  editor.view.coordsAtPos(to).left -
+                  editor.view.coordsAtPos(from).left,
+              },
+              type: isText ? "caret" : "mouse",
+            },
+          };
+
+          provider.awareness.setLocalStateField("user", newUser);
+        } catch (error) {
+          // Ignore coordinate calculation errors during rapid state changes
+          console.debug(
+            "Cursor position update skipped due to state change:",
+            error
+          );
+        }
+      }, 10); // Small delay to allow transactions to complete
     };
 
     editor.on("selectionUpdate", updateLocalCursor);
@@ -118,10 +134,11 @@ export default function CollaborationIndicators({
     updateLocalCursor();
 
     return () => {
+      clearTimeout(updateTimeout);
       editor.off("selectionUpdate", updateLocalCursor);
       editor.off("transaction", updateLocalCursor);
       editor.off("blur", handleBlur);
-      document.removeEventListener("mouseover", handleMouseMove);
+      document.removeEventListener("mousemove", handleMouseMove);
       provider.awareness.setLocalStateField("user", undefined);
     };
   }, [editor, provider]);

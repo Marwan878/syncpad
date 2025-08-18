@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, ElementType } from "react";
+import { ComponentPropsWithRef, ElementType } from "react";
 
 export type ButtonVariant =
   | "primary"
@@ -19,6 +19,6 @@ export type ButtonProps<T extends ElementType = "button"> = {
   isLoading?: boolean;
   loadingText?: string;
 } & Omit<
-  ComponentPropsWithoutRef<T>,
+  ComponentPropsWithRef<T>,
   "as" | "variant" | "isLoading" | "loadingText" | "size"
 >;

@@ -17,7 +17,7 @@ import { User } from "@/types/user";
 import { ConnectionStatus } from "@/types/page";
 import { CollaborationUser } from "@/types/live-collaborating-user";
 
-const AUTO_SAVE_INTERVAL_IN_MS = 5_000;
+const AUTO_SAVE_INTERVAL_IN_MS = 30_000;
 
 const ydoc = new Y.Doc();
 const initialUser: CollaborationUser = {
@@ -43,7 +43,7 @@ export default function useLiveCollaboration(
   const { getToken, userId, isLoaded: isAuthLoaded } = useAuth();
   const [status, setStatus] = useState<ConnectionStatus>("disconnected");
 
-  const persistence = new IndexeddbPersistence(pageId, ydoc);
+  new IndexeddbPersistence(pageId, ydoc);
 
   const { data: user } = useQuery({
     queryKey: ["user", userId],

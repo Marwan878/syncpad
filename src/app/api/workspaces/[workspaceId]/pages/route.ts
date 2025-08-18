@@ -92,8 +92,11 @@ export async function POST(
       newPage
     );
 
-    // Revalidate pages cache
+    // Invalidate pages cache
     await redis.del(`pages:${workspaceId}`);
+
+    // Invalidate workspace cache
+    await redis.del(`workspaces:${workspace.owner_id}`);
 
     return NextResponse.json(page, { status: 201 });
   } catch (error) {

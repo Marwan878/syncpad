@@ -80,7 +80,7 @@ export default function DeletePageModal({
           disabled={isDeleting}
           isLoading={isDeleting}
           loadingText="Deleting..."
-          onClick={deletePage}
+          onClick={() => deletePage()}
         >
           Delete Page
         </Button>

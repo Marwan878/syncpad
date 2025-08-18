@@ -3,25 +3,34 @@ import { MousePointer2 } from "lucide-react";
 import { CSSProperties } from "react";
 
 type PointerProps = {
-  className?: string;
+  wrapperClassName?: string;
+  pointerClassName?: string;
   username?: string;
   inverted?: boolean;
   style?: CSSProperties;
+  ref?: React.RefObject<HTMLDivElement | null>;
 };
 
 export default function Pointer({
-  className,
+  wrapperClassName,
+  pointerClassName,
   username,
   inverted,
   style,
+  ref,
 }: Readonly<PointerProps>) {
   return (
     <div
-      className={cn("absolute flex flex-col z-100", className)}
+      className={cn("absolute flex flex-col z-100", wrapperClassName)}
       style={style}
+      ref={ref}
     >
       <MousePointer2
-        className={cn("size-7 -mb-2", inverted && "rotate-y-180 self-end")}
+        className={cn(
+          "size-7 -mb-2",
+          inverted && "rotate-y-180 self-end",
+          pointerClassName
+        )}
         fill="currentColor"
         fillOpacity={0.5}
         aria-hidden

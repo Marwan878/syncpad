@@ -10,9 +10,8 @@ import Link from "next/link";
 import { Button } from "../ui";
 
 // Navigation and auth
-import { auth } from "@clerk/nextjs/server";
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
-import { notFound } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 
 type WorkspaceHeaderProps = {
   workspaceId: string;
@@ -35,8 +34,6 @@ export default async function WorkspaceHeader({
     }
   );
 
-  if (!workspace) notFound();
-
   const { name, description, pages_count, updated_at } = workspace;
 
   return (
@@ -56,18 +53,18 @@ export default async function WorkspaceHeader({
           <p className="text-text-secondary mt-2">{description}</p>
         )}
         <div className="flex items-center space-x-4 mt-2 text-sm text-text-secondary">
-          <span>{`${pages_count} ${handlePlural(
-            pages_count,
-            "page",
-            "pages"
-          )}`}</span>
+          {pages_count > 0 && (
+            <span>{`${pages_count} ${handlePlural(
+              pages_count,
+              "page",
+              "pages"
+            )}`}</span>
+          )}
+          {pages_count > 0 && updated_at && <span>•</span>}
           {updated_at && (
-            <>
-              <span>•</span>
-              <span>
-                Last updated {new Date(updated_at).toLocaleDateString()}
-              </span>
-            </>
+            <span>
+              Last updated {new Date(updated_at).toLocaleDateString()}
+            </span>
           )}
         </div>
       </div>

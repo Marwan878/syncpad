@@ -52,7 +52,7 @@ export default function RootLayout({
               <Toaster />
               <Navbar />
 
-              <main>{children}</main>
+              <main className="min-h-screen">{children}</main>
             </EdgeStoreProvider>
           </ReactQueryProvider>
         </body>

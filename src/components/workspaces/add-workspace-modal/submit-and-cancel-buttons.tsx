@@ -18,8 +18,13 @@ export default function SubmitAndCancelButtons({
       <Button variant="ghost" type="button" onClick={onClose}>
         Cancel
       </Button>
-      <Button disabled={isPending} onClick={onClick}>
-        {isPending ? "Creating..." : "Create Workspace"}
+      <Button
+        disabled={isPending}
+        onClick={onClick}
+        isLoading={isPending}
+        loadingText="Creating..."
+      >
+        Create Workspace
       </Button>
     </>
   );

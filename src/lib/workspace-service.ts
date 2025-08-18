@@ -68,7 +68,17 @@ const SHARED_WORKSPACES_QUERY = `
 const DELETE_WORKSPACE_AND_PAGES_MUTATION = `
   mutation DeleteWorkspaceAndPages($id: uuid!) {
     delete_workspace_and_pages(args: { _workspace_id: $id }) {
-      id
+          id
+          name
+          description
+          pages_count
+          created_at
+          updated_at
+          owner_id
+          allowed_viewers_ids
+          allowed_editors_ids
+          any_user_can_edit
+          any_user_can_view
     }
   }
 `;
@@ -162,10 +172,16 @@ export class WorkspaceService {
     }>(CREATE_WORKSPACE_MUTATION, { newWorkspace });
   }
 
-  async deleteWorkspaceAndPagesById(workspaceId: string): Promise<void> {
-    await this.hasura.query<void>(DELETE_WORKSPACE_AND_PAGES_MUTATION, {
+  async deleteWorkspaceAndPagesById(workspaceId: string): Promise<Workspace> {
+    const data = await this.hasura.query<{
+      delete_workspace_and_pages: Workspace;
+    }>(DELETE_WORKSPACE_AND_PAGES_MUTATION, {
       id: workspaceId,
     });
+
+    console.log(data.delete_workspace_and_pages);
+
+    return data.delete_workspace_and_pages;
   }
 
   async checkUserCanDelete(workspaceId: string, userId: string): Promise<void> {

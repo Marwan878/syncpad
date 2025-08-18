@@ -10,7 +10,7 @@ import {
 import { ButtonProps } from "./types";
 import { cn } from "@/lib/utils/cn";
 
-const Button = <T extends ElementType>({
+const Button = <T extends ElementType = "button">({
   variant = "primary",
   size = "md",
   isLoading = false,
@@ -39,7 +39,16 @@ const Button = <T extends ElementType>({
       {...props}
       className={cn(combinedClassName, props.className)}
     >
-      {isLoading && !loadingText && <Pencil aria-label="Loading" />}
+      {isLoading && (
+        <Pencil
+          size={16}
+          className="animate-spin"
+          style={{
+            animationDuration: "0.5s",
+          }}
+          aria-label="Loading"
+        />
+      )}
       {isLoading && loadingText && <span className="ms-2">{loadingText}</span>}
 
       {!isLoading && props.children}

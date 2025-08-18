@@ -21,8 +21,8 @@ export default function ImageShowcase() {
         <Image
           src="/brand.png"
           alt="SyncPad interface showcasing clean design and collaborative features"
-          width={2432}
-          height={1442}
+          width={1000}
+          height={500}
           className="w-full object-cover object-center"
           priority
         />

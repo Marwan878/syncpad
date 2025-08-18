@@ -34,8 +34,9 @@ import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/imag
 import "@/components/tiptap-node/list-node/list-node.scss";
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss";
 import { useEdgeStore } from "@/lib/edgestore";
+import { useEffect } from "react";
 
-export default function useConfiguredEditor(ydoc: Y.Doc) {
+export default function useConfiguredEditor(ydoc: Y.Doc, canEdit: boolean) {
   const { edgestore } = useEdgeStore();
   const editor = useEditor({
     immediatelyRender: false,
@@ -96,6 +97,12 @@ export default function useConfiguredEditor(ydoc: Y.Doc) {
     ],
     content: ``,
   });
+
+  useEffect(() => {
+    if (editor) {
+      editor.setEditable(canEdit);
+    }
+  }, [editor, canEdit]);
 
   return editor;
 }

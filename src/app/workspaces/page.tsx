@@ -41,25 +41,27 @@ export default function WorkspacesPage() {
   });
 
   return (
-    <Container className="min-h-screen bg-background-light mt-5">
-      <Header
-        isLoading={isLoading || !isLoaded}
-        setIsAddModalOpen={setIsAddModalOpen}
-        workspacesCount={workspaces?.length ?? 0}
-      />
-
-      <WorkspaceList
-        workspaces={workspaces ?? []}
-        onAddWorkspace={() => setIsAddModalOpen(true)}
-        isLoading={isLoading || !isLoaded}
-      />
-
-      {isAddModalOpen && (
-        <AddWorkspaceModal
-          onClose={() => setIsAddModalOpen(false)}
+    <div className="bg-background-light min-h-screen">
+      <Container className="py-8">
+        <Header
+          isLoading={isLoading || !isLoaded}
           setIsAddModalOpen={setIsAddModalOpen}
+          workspacesCount={workspaces?.length ?? 0}
         />
-      )}
-    </Container>
+
+        <WorkspaceList
+          workspaces={workspaces ?? []}
+          onAddWorkspace={() => setIsAddModalOpen(true)}
+          isLoading={isLoading || !isLoaded}
+        />
+
+        {isAddModalOpen && (
+          <AddWorkspaceModal
+            onClose={() => setIsAddModalOpen(false)}
+            setIsAddModalOpen={setIsAddModalOpen}
+          />
+        )}
+      </Container>
+    </div>
   );
 }

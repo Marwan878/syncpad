@@ -5,6 +5,7 @@ import WorkspaceHeaderSkeleton from "@/skeletons/workspace/header";
 import PageListSkeleton from "@/skeletons/workspace/page-list";
 
 import { Suspense } from "react";
+import { Container } from "@/components/ui";
 
 export default async function WorkspacePage({
   params,
@@ -16,14 +17,16 @@ export default async function WorkspacePage({
   // TODO: Make this route protected
 
   return (
-    <div className="min-h-screen bg-background-light mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-      <Suspense fallback={<WorkspaceHeaderSkeleton />}>
-        <Header workspaceId={workspaceId} />
-      </Suspense>
+    <div className="bg-background-light min-h-screen">
+      <Container className="py-8">
+        <Suspense fallback={<WorkspaceHeaderSkeleton />}>
+          <Header workspaceId={workspaceId} />
+        </Suspense>
 
-      <Suspense fallback={<PageListSkeleton />}>
-        <PageList workspaceId={workspaceId} />
-      </Suspense>
+        <Suspense fallback={<PageListSkeleton />}>
+          <PageList workspaceId={workspaceId} />
+        </Suspense>
+      </Container>
     </div>
   );
 }

@@ -30,4 +30,4 @@ export const disabledStyles =
 export const loadingStyles = "";
 
 export const baseStyles =
-  "inline-flex items-center justify-center rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background-light disabled:pointer-events-none";
+  "inline-flex items-center cursor-pointer justify-center rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background-light disabled:pointer-events-none";

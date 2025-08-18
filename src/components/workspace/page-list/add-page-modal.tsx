@@ -95,7 +95,7 @@ export default function AddPageModal({
           disabled={!title.trim()}
           isLoading={isLoading}
           loadingText="Creating..."
-          onClick={createPage}
+          onClick={() => createPage()}
         >
           Create Page
         </Button>
