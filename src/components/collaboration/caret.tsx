@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils/cn";
 import hexToRgba from "@/lib/utils/hex-to-rgba";
 import { CollaborationUser } from "@/types/live-collaborating-user";
 import { createPortal } from "react-dom";
@@ -8,17 +9,15 @@ type CaretProps = {
 };
 
 export default function Caret({ user, className }: Readonly<CaretProps>) {
-  if (!user.cursor) return null;
-
   return createPortal(
     <div
-      className="absolute pointer-events-none z-10"
+      className={cn("absolute pointer-events-none z-10", className)}
       style={{
         left: user.cursor.position.x,
         top: user.cursor.position.y,
-        height: user.cursor.position.height,
+        height: user.cursor.height,
         borderLeft: `2px solid ${user.color}`,
-        width: `${user.cursor.position.width}px`,
+        width: `${user.cursor.width}px`,
         backgroundColor: hexToRgba(user.color, 0.2),
       }}
     >

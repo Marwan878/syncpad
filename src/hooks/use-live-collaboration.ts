@@ -4,37 +4,19 @@ import uint8ArrayToBase64 from "@/lib/utils/uint8-array-to-base-64";
 
 // --- Hooks ---
 import { useAuth } from "@clerk/nextjs";
-import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
 // --- Yjs ---
-import { WebsocketProvider } from "y-websocket";
 import { IndexeddbPersistence } from "y-indexeddb";
+import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
 // --- Types ---
-import { User } from "@/types/user";
 import { ConnectionStatus } from "@/types/page";
-import { CollaborationUser } from "@/types/live-collaborating-user";
 
 const AUTO_SAVE_INTERVAL_IN_MS = 30_000;
 
 const ydoc = new Y.Doc();
-const initialUser: CollaborationUser = {
-  name: "Loading...",
-  color: "#" + Math.floor(Math.random() * 0xffffff).toString(16),
-  cursor: {
-    anchor: 0,
-    head: 0,
-    position: {
-      x: 0,
-      y: 0,
-      height: 0,
-      width: 0,
-    },
-    type: "mouse",
-  },
-};
 
 export default function useLiveCollaboration(
   workspaceId: string,
@@ -45,33 +27,13 @@ export default function useLiveCollaboration(
 
   new IndexeddbPersistence(pageId, ydoc);
 
-  const { data: user } = useQuery({
-    queryKey: ["user", userId],
-    queryFn: async () => {
-      const token = await getToken();
-      const user = await fetchWithAuth<User>({
-        relativeUrl: `/users/${userId}`,
-        token,
-        userId,
-      });
-
-      return user;
-    },
-    enabled: isAuthLoaded,
-  });
-
   const provider = useMemo(() => {
-    if (!user) return null;
-
     const p = new WebsocketProvider("ws://localhost:1234", pageId, ydoc);
-    // Set user info for awareness
-    p.awareness.setLocalStateField("user", {
-      ...initialUser,
-      name: user?.name ?? "Loading...",
-    });
-    return p;
-  }, [pageId, user?.name]);
 
+    return p;
+  }, [pageId]);
+
+  // Handles connection status
   useEffect(() => {
     const setOffline = () => {
       setStatus("disconnected");
@@ -96,7 +58,7 @@ export default function useLiveCollaboration(
     };
   }, [provider]);
 
-  // Auto save
+  // Auto save for backup
   useEffect(() => {
     if (!isAuthLoaded) return;
 

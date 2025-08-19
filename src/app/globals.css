@@ -204,9 +204,21 @@ h1.Typewriter {
   border-radius: 10px;
 }
 
+body:has(.simple-editor-content) {
+  overflow-x: hidden;
+}
+
 :is(
     main:has(.simple-editor-content)
-      :where(button, div:not(.node-imageUpload), span, path, svg, a),
+      :where(
+        button,
+        div:not(.node-imageUpload),
+        span,
+        path,
+        svg,
+        a,
+        ul[data-type="taskList"] li :where(label, span, span::before)
+      ),
     html:has(.simple-editor-content)
   ) {
   cursor: none;
@@ -220,6 +232,15 @@ div.node-imageUpload * {
   cursor: auto;
 }
 
-main:has(.simple-editor-content) :not(button, div, span, path, svg, a) {
+main:has(.simple-editor-content)
+  :not(
+    button,
+    div,
+    span,
+    path,
+    svg,
+    a,
+    ul[data-type="taskList"] li :where(label, span, span::before)
+  ) {
   cursor: url("/textcursor.png") 16 16, text;
 }

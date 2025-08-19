@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
       {
         hostname: "3rzhxgaojq.ufs.sh",
       },
+      {
+        hostname: "img.clerk.com",
+      },
     ],
   },
   devIndicators: false,

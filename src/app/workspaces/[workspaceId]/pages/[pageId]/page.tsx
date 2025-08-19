@@ -55,6 +55,7 @@ export default function Page() {
 
   const { getToken, userId, isLoaded: isAuthLoaded } = useAuth();
 
+  const { cursorRef, toolbarRef, isCursorVisible } = useCustomCursor();
   const { ydoc, provider, status } = useLiveCollaboration(workspaceId, pageId);
 
   const { data: accessData, isLoading: isPermissionsLoading } = useQuery({
@@ -87,8 +88,6 @@ export default function Page() {
   });
 
   const editor = useConfiguredEditor(ydoc, accessData?.canEdit ?? false);
-
-  const { cursorRef, toolbarRef, isCursorVisible } = useCustomCursor();
 
   if (!editor || isPermissionsLoading || !isAuthLoaded) return null;
 

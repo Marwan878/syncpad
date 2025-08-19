@@ -69,14 +69,17 @@ export default function useCustomCursor() {
       if (e.target instanceof HTMLElement)
         setIsCursorVisible(
           e.clientY - 10 <= toolbarRect.top ||
-            ((e.target.nodeName === "DIV" ||
-              e.target.nodeName === "MAIN" ||
-              e.target.nodeName === "BUTTON" ||
-              e.target.nodeName === "SPAN" ||
-              e.target.nodeName === "PATH" ||
-              e.target.nodeName === "HTML" ||
-              e.target.nodeName === "A" ||
-              e.target.nodeName === "SVG") &&
+            ((e.target.tagName === "DIV" ||
+              e.target.tagName === "MAIN" ||
+              e.target.tagName === "BUTTON" ||
+              e.target.tagName === "SPAN" ||
+              e.target.tagName === "PATH" ||
+              e.target.tagName === "HTML" ||
+              e.target.tagName === "A" ||
+              e.target.tagName === "LI" ||
+              (e.target.tagName === "LABEL" &&
+                e.target.closest("ul[data-type='taskList']")) ||
+              e.target.tagName === "SVG") &&
               !e.target.closest(".node-imageUpload"))
         );
     };

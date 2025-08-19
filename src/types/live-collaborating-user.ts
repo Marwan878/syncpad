@@ -22,8 +22,8 @@ type Cursor = {
   position: {
     x: number;
     y: number;
-    height: number;
-    width: number;
   };
+  height: number;
+  width: number;
   type: "caret" | "mouse";
 };
