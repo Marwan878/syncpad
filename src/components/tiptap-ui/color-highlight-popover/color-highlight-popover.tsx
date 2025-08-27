@@ -1,53 +1,53 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { type Editor } from "@tiptap/react"
+import * as React from "react";
+import { type Editor } from "@tiptap/react";
 
 // --- Hooks ---
-import { useMenuNavigation } from "@/hooks/use-menu-navigation"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useMenuNavigation } from "@/hooks/use-menu-navigation";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useTiptapEditor } from "@/hooks/use-tiptap-editor";
 
 // --- Icons ---
-import { BanIcon } from "@/components/tiptap-icons/ban-icon"
-import { HighlighterIcon } from "@/components/tiptap-icons/highlighter-icon"
+import { BanIcon } from "@/components/tiptap-icons/ban-icon";
+import { HighlighterIcon } from "@/components/tiptap-icons/highlighter-icon";
 
 // --- UI Primitives ---
-import type { ButtonProps } from "@/components/tiptap-ui-primitive/button"
-import { Button, ButtonGroup } from "@/components/tiptap-ui-primitive/button"
+import type { ButtonProps } from "@/components/tiptap-ui-primitive/button";
+import { Button, ButtonGroup } from "@/components/tiptap-ui-primitive/button";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-} from "@/components/tiptap-ui-primitive/popover"
-import { Separator } from "@/components/tiptap-ui-primitive/separator"
+} from "@/components/tiptap-ui-primitive/popover";
+import { Separator } from "@/components/tiptap-ui-primitive/separator";
 import {
   Card,
   CardBody,
   CardItemGroup,
-} from "@/components/tiptap-ui-primitive/card"
+} from "@/components/tiptap-ui-primitive/card";
 
 // --- Tiptap UI ---
 import type {
   HighlightColor,
   UseColorHighlightConfig,
-} from "@/components/tiptap-ui/color-highlight-button"
+} from "@/components/tiptap-ui/color-highlight-button";
 import {
   ColorHighlightButton,
   pickHighlightColorsByValue,
   useColorHighlight,
-} from "@/components/tiptap-ui/color-highlight-button"
+} from "@/components/tiptap-ui/color-highlight-button";
 
 export interface ColorHighlightPopoverContentProps {
   /**
    * The Tiptap editor instance.
    */
-  editor?: Editor | null
+  editor?: Editor | null;
   /**
    * Optional colors to use in the highlight popover.
    * If not provided, defaults to a predefined set of colors.
    */
-  colors?: HighlightColor[]
+  colors?: HighlightColor[];
 }
 
 export interface ColorHighlightPopoverProps
@@ -60,7 +60,7 @@ export interface ColorHighlightPopoverProps
    * Optional colors to use in the highlight popover.
    * If not provided, defaults to a predefined set of colors.
    */
-  colors?: HighlightColor[]
+  colors?: HighlightColor[];
 }
 
 export const ColorHighlightPopoverButton = React.forwardRef<
@@ -81,9 +81,9 @@ export const ColorHighlightPopoverButton = React.forwardRef<
   >
     {children ?? <HighlighterIcon className="tiptap-button-icon" />}
   </Button>
-))
+));
 
-ColorHighlightPopoverButton.displayName = "ColorHighlightPopoverButton"
+ColorHighlightPopoverButton.displayName = "ColorHighlightPopoverButton";
 
 export function ColorHighlightPopoverContent({
   editor,
@@ -95,29 +95,29 @@ export function ColorHighlightPopoverContent({
     "var(--tt-color-highlight-yellow)",
   ]),
 }: ColorHighlightPopoverContentProps) {
-  const { handleRemoveHighlight } = useColorHighlight({ editor })
-  const isMobile = useIsMobile()
-  const containerRef = React.useRef<HTMLDivElement>(null)
+  const { handleRemoveHighlight } = useColorHighlight({ editor });
+  const isMobile = useIsMobile();
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   const menuItems = React.useMemo(
     () => [...colors, { label: "Remove highlight", value: "none" }],
     [colors]
-  )
+  );
 
   const { selectedIndex } = useMenuNavigation({
     containerRef,
     items: menuItems,
     orientation: "both",
     onSelect: (item) => {
-      if (!containerRef.current) return false
+      if (!containerRef.current) return false;
       const highlightedElement = containerRef.current.querySelector(
         '[data-highlighted="true"]'
-      ) as HTMLElement
-      if (highlightedElement) highlightedElement.click()
-      if (item.value === "none") handleRemoveHighlight()
+      ) as HTMLElement;
+      if (highlightedElement) highlightedElement.click();
+      if (item.value === "none") handleRemoveHighlight();
     },
     autoSelectFirstItem: false,
-  })
+  });
 
   return (
     <Card
@@ -137,6 +137,7 @@ export function ColorHighlightPopoverContent({
                 aria-label={`${color.label} highlight color`}
                 tabIndex={index === selectedIndex ? 0 : -1}
                 data-highlighted={selectedIndex === index}
+                className="cursor-none"
               />
             ))}
           </ButtonGroup>
@@ -151,6 +152,7 @@ export function ColorHighlightPopoverContent({
               role="menuitem"
               data-style="ghost"
               data-highlighted={selectedIndex === colors.length}
+              className="cursor-none"
             >
               <BanIcon className="tiptap-button-icon" />
             </Button>
@@ -158,7 +160,7 @@ export function ColorHighlightPopoverContent({
         </CardItemGroup>
       </CardBody>
     </Card>
-  )
+  );
 }
 
 export function ColorHighlightPopover({
@@ -174,16 +176,16 @@ export function ColorHighlightPopover({
   onApplied,
   ...props
 }: ColorHighlightPopoverProps) {
-  const { editor } = useTiptapEditor(providedEditor)
-  const [isOpen, setIsOpen] = React.useState(false)
+  const { editor } = useTiptapEditor(providedEditor);
+  const [isOpen, setIsOpen] = React.useState(false);
   const { isVisible, canColorHighlight, isActive, label, Icon } =
     useColorHighlight({
       editor,
       hideWhenUnavailable,
       onApplied,
-    })
+    });
 
-  if (!isVisible) return null
+  if (!isVisible) return null;
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -196,6 +198,8 @@ export function ColorHighlightPopover({
           aria-label={label}
           tooltip={label}
           {...props}
+          style={{ "--cursor": "default" } as React.CSSProperties}
+          className="cursor-none"
         >
           <Icon className="tiptap-button-icon" />
         </ColorHighlightPopoverButton>
@@ -204,7 +208,7 @@ export function ColorHighlightPopover({
         <ColorHighlightPopoverContent editor={editor} colors={colors} />
       </PopoverContent>
     </Popover>
-  )
+  );
 }
 
-export default ColorHighlightPopover
+export default ColorHighlightPopover;

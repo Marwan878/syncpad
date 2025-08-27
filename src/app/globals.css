@@ -208,39 +208,10 @@ body:has(.simple-editor-content) {
   overflow-x: hidden;
 }
 
-:is(
-    main:has(.simple-editor-content)
-      :where(
-        button,
-        div:not(.node-imageUpload),
-        span,
-        path,
-        svg,
-        a,
-        ul[data-type="taskList"] li :where(label, span, span::before)
-      ),
-    html:has(.simple-editor-content)
-  ) {
+main:has(.simple-editor-content) * {
   cursor: none;
 }
 
-html:has(.simple-editor-content) header {
-  cursor: auto;
-}
-
-div.node-imageUpload * {
-  cursor: auto;
-}
-
-main:has(.simple-editor-content)
-  :not(
-    button,
-    div,
-    span,
-    path,
-    svg,
-    a,
-    ul[data-type="taskList"] li :where(label, span, span::before)
-  ) {
-  cursor: url("/textcursor.png") 16 16, text;
+img {
+  --cursor: default;
 }

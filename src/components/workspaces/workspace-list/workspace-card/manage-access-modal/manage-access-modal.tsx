@@ -83,7 +83,6 @@ export default function ManageAccessModal({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          console.log("Submitting");
           updateWorkspaceAccess();
         }}
       >

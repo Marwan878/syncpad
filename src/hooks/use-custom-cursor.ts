@@ -1,13 +1,17 @@
+import { Editor } from "@tiptap/react";
 import { useEffect, useRef, useState } from "react";
 
-export default function useCustomCursor() {
-  const cursorRef = useRef<HTMLDivElement | null>(null);
-  const toolbarRef = useRef<{
-    getRect: () => DOMRect;
-  }>({
-    getRect: () => new DOMRect(),
-  });
+const AVAILABLE_CURSORS = ["ibeam", "default"] as const;
 
+export default function useCustomCursor(
+  editor: Editor | null,
+  topElementRef: React.RefObject<HTMLDivElement | null>,
+  toolbarRef: React.RefObject<HTMLDivElement | null>
+) {
+  const cursorRef = useRef<HTMLImageElement | null>(null);
+
+  const [cursorType, setCursorType] =
+    useState<(typeof AVAILABLE_CURSORS)[number]>("default");
   const [isCursorVisible, setIsCursorVisible] = useState(false);
 
   // Handles clicking animation
@@ -15,7 +19,7 @@ export default function useCustomCursor() {
     let timeout: NodeJS.Timeout | undefined = undefined;
 
     const handleMouseClick = () => {
-      if (timeout) return;
+      if (timeout || !isCursorVisible) return;
 
       const cursor = cursorRef.current;
       if (!cursor) return;
@@ -34,23 +38,24 @@ export default function useCustomCursor() {
       document.removeEventListener("click", handleMouseClick);
       if (timeout) clearTimeout(timeout);
     };
-  }, []);
+  }, [isCursorVisible]);
 
   // Handles moving the cursor
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      const toolbarRect = toolbarRef.current?.getRect();
-      if (!toolbarRect) return;
+      const topElementRect = topElementRef.current?.getBoundingClientRect();
+      if (!topElementRect) return;
+
+      // Hide custom cursor if it's above the top element (in the header)
+      setIsCursorVisible(e.clientY >= topElementRect.top);
 
       const cursor = cursorRef.current;
       if (!cursor) return;
 
-      // Ignore moving the cursor if it's above the toolbar
-      // We just want to show the custom cursor in the editor
-      if (e.clientY - 10 < toolbarRect.top) return;
+      const cursorHotspotMargin = cursorType === "ibeam" ? 16 : 0;
 
-      cursor.style.left = e.clientX - 10 + "px";
-      cursor.style.top = e.clientY - 10 + "px";
+      cursor.style.left = e.clientX - cursorHotspotMargin + "px";
+      cursor.style.top = e.clientY - cursorHotspotMargin + "px";
     };
 
     document.addEventListener("mousemove", handleMouseMove);
@@ -58,38 +63,57 @@ export default function useCustomCursor() {
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
     };
-  }, []);
+  }, [cursorType, topElementRef]);
 
-  // Handles showing the cursor
+  // Handles showing cursor type default / I-beam
   useEffect(() => {
-    const handleMouseOver = (e: MouseEvent) => {
-      const toolbarRect = toolbarRef.current?.getRect();
-      if (!toolbarRect) return;
+    function handleMouseOver(e: MouseEvent) {
+      if (!isCursorVisible || !toolbarRef.current) return;
 
-      if (e.target instanceof HTMLElement)
-        setIsCursorVisible(
-          e.clientY - 10 <= toolbarRect.top ||
-            ((e.target.tagName === "DIV" ||
-              e.target.tagName === "MAIN" ||
-              e.target.tagName === "BUTTON" ||
-              e.target.tagName === "SPAN" ||
-              e.target.tagName === "PATH" ||
-              e.target.tagName === "HTML" ||
-              e.target.tagName === "A" ||
-              e.target.tagName === "LI" ||
-              (e.target.tagName === "LABEL" &&
-                e.target.closest("ul[data-type='taskList']")) ||
-              e.target.tagName === "SVG") &&
-              !e.target.closest(".node-imageUpload"))
-        );
-    };
+      const target = e.target;
+
+      if (!(target instanceof HTMLElement)) return;
+      const toolbar = toolbarRef.current;
+      const toolbarRect = toolbar.getBoundingClientRect();
+
+      // If we're inside the toolbar or a popover or an image uploader or an image the cursor type is infered from the --cursor CSS variable
+      if (
+        toolbarRef.current.contains(target) ||
+        target.closest("[data-radix-popper-content-wrapper]") ||
+        target.closest(".node-imageUpload") ||
+        target.tagName === "IMG" ||
+        target.tagName === "BUTTON" ||
+        e.clientY < toolbarRect.top
+      ) {
+        const targetStyle = getComputedStyle(target);
+        const targetAssignedCursor = targetStyle.getPropertyValue("--cursor");
+
+        if (isDefinedCursorType(targetAssignedCursor)) {
+          setCursorType(targetAssignedCursor);
+        } else {
+          setCursorType("default");
+          console.debug(target, "cursor property value not set");
+        }
+        // Other than that we're in the editor, so we show an I-Beam by default
+      } else {
+        setCursorType("ibeam");
+      }
+    }
 
     document.addEventListener("mouseover", handleMouseOver);
 
     return () => {
       document.removeEventListener("mouseover", handleMouseOver);
     };
-  }, []);
+  }, [topElementRef, isCursorVisible, toolbarRef]);
 
-  return { cursorRef, toolbarRef, isCursorVisible };
+  return { cursorRef, isCursorVisible, cursorType };
+}
+
+function isDefinedCursorType(
+  cursorType: string
+): cursorType is (typeof AVAILABLE_CURSORS)[number] {
+  return AVAILABLE_CURSORS.includes(
+    cursorType as (typeof AVAILABLE_CURSORS)[number]
+  );
 }

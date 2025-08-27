@@ -30,6 +30,7 @@ type MainToolbarContentProps = {
   onHighlighterClick: () => void;
   onLinkClick: () => void;
   isMobile: boolean;
+  pageTitle: string;
 };
 
 export default function MainToolbarContent({
@@ -37,6 +38,7 @@ export default function MainToolbarContent({
   onHighlighterClick,
   onLinkClick,
   isMobile,
+  pageTitle,
 }: Readonly<MainToolbarContentProps>) {
   return (
     <>
@@ -102,17 +104,13 @@ export default function MainToolbarContent({
 
       <ToolbarGroup>
         <ShareDropdownMenu
-          pageTitle={"%page title%"}
+          pageTitle={pageTitle}
           portal={isMobile}
           providedEditor={editor}
         />
       </ToolbarGroup>
 
       {isMobile && <ToolbarSeparator />}
-
-      {/* <ToolbarGroup>
-          <ThemeToggle />
-        </ToolbarGroup> */}
     </>
   );
 }

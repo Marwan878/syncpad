@@ -6,7 +6,7 @@ import { Toolbar as ToolbarPrimitive } from "@/components/tiptap-ui-primitive/to
 // --- Hooks ---
 import { useCursorVisibility } from "@/hooks/use-cursor-visibility";
 import { useWindowSize } from "@/hooks/use-window-size";
-import { useImperativeHandle, useRef } from "react";
+import { CSSProperties } from "react";
 
 // --- Types ---
 import { Editor } from "@tiptap/react";
@@ -20,9 +20,8 @@ type ToolbarProps = {
   isMobile: boolean;
   mobileView: "main" | "highlighter" | "link";
   setMobileView: (view: "main" | "highlighter" | "link") => void;
-  ref?: React.RefObject<{
-    getRect: () => DOMRect;
-  }>;
+  toolbarRef: React.RefObject<HTMLDivElement | null>;
+  pageTitle: string;
 };
 
 export default function Toolbar({
@@ -30,33 +29,34 @@ export default function Toolbar({
   isMobile,
   mobileView,
   setMobileView,
-  ref,
+  toolbarRef,
+  pageTitle,
 }: Readonly<ToolbarProps>) {
   const { height } = useWindowSize();
-  const toolbarRef = useRef<HTMLDivElement>(null);
 
   const rect = useCursorVisibility({
     editor,
     overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,
   });
 
-  useImperativeHandle(ref, () => ({
-    getRect: () => toolbarRef.current?.getBoundingClientRect() ?? new DOMRect(),
-  }));
-
   return (
     <ToolbarPrimitive
       ref={toolbarRef}
-      style={{
-        ...(isMobile
-          ? {
-              bottom: `calc(100% - ${height - rect.y}px)`,
-            }
-          : {}),
-      }}
+      style={
+        {
+          ...(isMobile
+            ? {
+                bottom: `calc(100% - ${height - rect.y}px)`,
+              }
+            : {}),
+          borderTop: "1px solid var(--tt-toolbar-border-color)",
+          "--cursor": "default",
+        } as CSSProperties
+      }
     >
       {mobileView === "main" ? (
         <MainToolbarContent
+          pageTitle={pageTitle}
           editor={editor}
           onHighlighterClick={() => setMobileView("highlighter")}
           onLinkClick={() => setMobileView("link")}

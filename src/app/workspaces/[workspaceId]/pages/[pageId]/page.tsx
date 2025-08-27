@@ -4,13 +4,9 @@
 // TODO: Encrypt content client-side for privacy.
 // TODO: Decrypt only on the client, backend stores encrypted blobs.
 // TODO: Scalable architecture for multiple users
-// TODO: Use GraphQL for frontend
 // TODO: Comprehensive testing
-
-import "@/styles/_keyframe-animations.scss";
-import "@/styles/_variables.scss";
-
-import { EditorContent, EditorContext } from "@tiptap/react";
+// TODO: Ensure proper cursor positioning of other collaborators
+// TODO: Complete all TODOs
 
 // --- Hooks ---
 import useConfiguredEditor from "@/hooks/use-configured-editor";
@@ -20,33 +16,48 @@ import useMobileView from "@/hooks/use-mobile-view";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss";
+import "@/styles/_keyframe-animations.scss";
+import "@/styles/_variables.scss";
 
 // --- Components ---
 import CollaborationIndicators from "@/components/collaboration/collaboration-indicators";
 import ConfirmDeleteTableModal from "@/components/page/editor/confirm-delete-table-modal";
+import Cursor from "@/components/page/editor/cursor";
 import TableMenu from "@/components/page/editor/table-menu";
 import ForbiddenMessage from "@/components/page/forbidden-message";
 import Toolbar from "@/components/page/toolbar/toolbar";
-import Pointer from "@/components/ui/pointer";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbSeparator,
+  Container,
+} from "@/components/ui";
 import StatusIndicator from "@/components/ui/status-indicator";
+import { EditorContent, EditorContext } from "@tiptap/react";
 
 // --- Utils ---
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 
 // --- Types ---
+import { Page as PageType } from "@/types/page";
 import { Workspace } from "@/types/workspace";
-
-// --- React ---
-import { createPortal } from "react-dom";
+import { CSSProperties } from "react";
+import useIsTouchScreen from "@/hooks/use-is-touch-screen";
 
 export default function Page() {
   const { isMobile, mobileView, setMobileView } = useMobileView();
 
+  const topElementRef = useRef<HTMLDivElement>(null);
+
+  const toolbarRef = useRef<HTMLDivElement>(null);
+
   const [confirmDeleteTableOpen, setConfirmDeleteTableOpen] = useState(false);
+
+  const { isTouchScreen } = useIsTouchScreen();
 
   const { workspaceId, pageId } = useParams() as {
     workspaceId: string;
@@ -54,11 +65,7 @@ export default function Page() {
   };
 
   const { getToken, userId, isLoaded: isAuthLoaded } = useAuth();
-
-  const { cursorRef, toolbarRef, isCursorVisible } = useCustomCursor();
-  const { ydoc, provider, status } = useLiveCollaboration(workspaceId, pageId);
-
-  const { data: accessData, isLoading: isPermissionsLoading } = useQuery({
+  const { data: workspaceData, isLoading: isPermissionsLoading } = useQuery({
     queryKey: ["workspace", workspaceId],
     queryFn: async () => {
       const token = await getToken();
@@ -82,36 +89,91 @@ export default function Page() {
         (userId && workspace.allowed_viewers_ids.includes(userId))
       );
 
-      return { canEdit, canView };
+      return { accessData: { canEdit, canView }, workspace };
     },
     enabled: isAuthLoaded,
   });
 
-  const editor = useConfiguredEditor(ydoc, accessData?.canEdit ?? false);
+  const { data: page, isLoading: isPageLoading } = useQuery({
+    queryKey: ["page", pageId],
+    queryFn: async () => {
+      const token = await getToken();
+      const page = await fetchWithAuth<PageType>({
+        relativeUrl: `/workspaces/${workspaceId}/pages/${pageId}`,
+        token,
+        userId,
+      });
 
-  if (!editor || isPermissionsLoading || !isAuthLoaded) return null;
+      return page;
+    },
+    enabled: isAuthLoaded,
+  });
 
-  if (!accessData?.canView && !accessData?.canEdit) return <ForbiddenMessage />;
+  const { ydoc, provider, status } = useLiveCollaboration(workspaceId, pageId);
+  const editor = useConfiguredEditor(
+    ydoc,
+    workspaceData?.accessData?.canEdit ?? false
+  );
+  const { cursorRef, isCursorVisible, cursorType } = useCustomCursor(
+    editor,
+    topElementRef,
+    toolbarRef
+  );
+
+  if (
+    !editor ||
+    isPermissionsLoading ||
+    !isAuthLoaded ||
+    isPageLoading ||
+    !workspaceData ||
+    !page
+  )
+    return null;
+
+  if (!workspaceData.accessData?.canView && !workspaceData.accessData?.canEdit)
+    return <ForbiddenMessage />;
 
   return (
     <EditorContext.Provider value={{ editor }}>
+      <Container
+        className="py-6"
+        ref={topElementRef}
+        style={{ "--cursor": "default" } as CSSProperties}
+      >
+        <Breadcrumb>
+          <BreadcrumbItem
+            href={`/workspaces/${workspaceId}`}
+            title={`Return to ${workspaceData.workspace.name}`}
+          >
+            {workspaceData.workspace.name}
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem isLast title="Current page name">
+            {page.title}
+          </BreadcrumbItem>
+        </Breadcrumb>
+      </Container>
       <Toolbar
         editor={editor}
         isMobile={isMobile}
         mobileView={mobileView}
         setMobileView={setMobileView}
-        ref={toolbarRef}
+        toolbarRef={toolbarRef}
+        pageTitle={page.title}
       />
-      <div className="relative">
+      <div
+        className="relative"
+        style={{ "--cursor": "ibeam" } as CSSProperties}
+      >
         <EditorContent
           editor={editor}
           role="presentation"
           className="simple-editor-content"
         />
-        {editor && accessData?.canEdit && (
+        {editor && workspaceData.accessData?.canEdit && (
           <CollaborationIndicators
             editor={editor}
-            provider={accessData?.canEdit ? provider : null}
+            provider={workspaceData.accessData?.canEdit ? provider : null}
           />
         )}
       </div>
@@ -132,14 +194,9 @@ export default function Page() {
       )}
 
       <StatusIndicator status={status} className="fixed bottom-3 right-3" />
-      {isCursorVisible &&
-        createPortal(
-          <Pointer
-            wrapperClassName="pointer-events-none text-brand fixed"
-            ref={cursorRef}
-          />,
-          document.body
-        )}
+      {isCursorVisible && isTouchScreen !== null && !isTouchScreen && (
+        <Cursor cursorRef={cursorRef} cursorType={cursorType} />
+      )}
     </EditorContext.Provider>
   );
 }

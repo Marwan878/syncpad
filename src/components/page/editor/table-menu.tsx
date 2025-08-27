@@ -115,6 +115,7 @@ export default function TableMenu({
               item.className ?? ""
             }`}
             onClick={() => item.onClick(editor, setConfirmDeleteTableOpen)}
+            style={{ "--cursor": "default" } as React.CSSProperties}
           >
             {item.children}
           </button>

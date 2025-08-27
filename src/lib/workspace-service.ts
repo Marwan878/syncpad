@@ -179,8 +179,6 @@ export class WorkspaceService {
       id: workspaceId,
     });
 
-    console.log(data.delete_workspace_and_pages);
-
     return data.delete_workspace_and_pages;
   }
 

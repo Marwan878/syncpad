@@ -1,3 +1,5 @@
+"use client";
+
 // --- Lib ---
 import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import uint8ArrayToBase64 from "@/lib/utils/uint8-array-to-base-64";

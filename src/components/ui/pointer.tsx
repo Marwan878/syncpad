@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils/cn";
 import { MousePointer2 } from "lucide-react";
-import { CSSProperties } from "react";
+import { CSSProperties, RefObject } from "react";
 
 type PointerProps = {
   wrapperClassName?: string;
@@ -8,7 +8,7 @@ type PointerProps = {
   username?: string;
   inverted?: boolean;
   style?: CSSProperties;
-  ref?: React.RefObject<HTMLDivElement | null>;
+  ref?: RefObject<HTMLDivElement | null>;
 };
 
 export default function Pointer({

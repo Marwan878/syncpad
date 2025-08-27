@@ -1,3 +1,4 @@
+export { Breadcrumb, BreadcrumbItem, BreadcrumbSeparator } from "./breadcrumb";
 export { default as Button } from "./button/button";
 export { default as Container } from "./container";
 export { default as Logo } from "./logo";
