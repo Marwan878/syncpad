@@ -1,8 +1,8 @@
-import { ClerkClient } from "@/lib/clerk-client";
+import { AuthService } from "@/lib/services/auth-service";
 import { handleError, ValidationError } from "@/lib/error";
-import { PageService } from "@/lib/page-service";
+import { PageService } from "@/lib/services/page-service";
 import { redis } from "@/lib/redis";
-import { WorkspaceService } from "@/lib/workspace-service";
+import { WorkspaceService } from "@/lib/services/workspace-service";
 import { Page } from "@/types/page";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -13,14 +13,9 @@ export async function GET(
   try {
     const { workspaceId } = await params;
 
-    // TODO: Delegate this check to other functions
-    if (!workspaceId) {
-      throw new ValidationError("Workspace ID is required");
-    }
-
     // Authentication and authorization
-    const clerkClient = ClerkClient.getInstance();
-    const userId = await clerkClient.authenticateRequest(request);
+    const clerkClient = AuthService.getInstance();
+    const userId = await clerkClient.checkSignedIn(request);
 
     // Return cached pages if they exist
     const cacheKey = `pages:${workspaceId}`;
@@ -53,14 +48,9 @@ export async function POST(
   try {
     const { workspaceId } = await params;
 
-    // TODO: Delegate this check to other functions
-    if (!workspaceId) {
-      throw new ValidationError("Workspace ID is required");
-    }
-
     // Authentication and authorization
-    const clerkClient = ClerkClient.getInstance();
-    const userId = await clerkClient.authenticateRequest(request);
+    const clerkClient = AuthService.getInstance();
+    const userId = await clerkClient.checkSignedIn(request);
 
     const workspaceService = WorkspaceService.getInstance();
     workspaceService.checkUserCanEdit(workspaceId, userId);

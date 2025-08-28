@@ -38,7 +38,7 @@ export default function CollaborationIndicators({
   editor,
   provider,
 }: Readonly<CollaborationIndicatorsProps>) {
-  const [, rerender] = useReducer((x) => x + 1, 0);
+  const [, rerender] = useReducer((x) => -x, 1);
   const { getToken, userId, isLoaded: isAuthLoaded } = useAuth();
 
   const { data: user } = useQuery({
@@ -123,6 +123,8 @@ export default function CollaborationIndicators({
           };
 
           provider.awareness.setLocalStateField("user", updatedUser);
+
+          console.log(provider.awareness.getStates());
         } catch (error) {
           // Ignore coordinate calculation errors during rapid state changes
           console.debug(
@@ -130,21 +132,21 @@ export default function CollaborationIndicators({
             error
           );
         }
-      }, 10); // Small delay to allow transactions to complete
+      }, 4); // Small delay to allow transactions to complete
     };
 
-    editor.on("selectionUpdate", updateLocalCursor);
-    editor.on("transaction", updateLocalCursor);
-    editor.on("focus", updateLocalCursor);
+    editor.on("selectionUpdate", () => updateLocalCursor());
+    editor.on("transaction", () => updateLocalCursor());
+    editor.on("focus", () => updateLocalCursor());
     document.addEventListener("mousemove", updateLocalCursor);
 
     updateLocalCursor();
 
     return () => {
       clearTimeout(updateTimeout);
-      editor.off("selectionUpdate", updateLocalCursor);
-      editor.off("transaction", updateLocalCursor);
-      editor.off("focus", updateLocalCursor);
+      editor.off("selectionUpdate", () => updateLocalCursor());
+      editor.off("transaction", () => updateLocalCursor());
+      editor.off("focus", () => updateLocalCursor());
       document.removeEventListener("mousemove", updateLocalCursor);
       provider.awareness.setLocalState(null);
     };

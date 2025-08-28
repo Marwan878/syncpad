@@ -1,5 +1,5 @@
 import { Container } from "../../ui";
-import CallsToAction from "./CallsToAction";
+import CallsToAction from "./calls-to-action";
 import Description from "./description";
 import FloatingPointers from "./floating-pointers";
 import Heading from "./heading";

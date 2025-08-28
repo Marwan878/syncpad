@@ -83,6 +83,8 @@ export default function useCustomCursor(
         target.closest(".node-imageUpload") ||
         target.tagName === "IMG" ||
         target.tagName === "BUTTON" ||
+        (target.closest("label") &&
+          target.closest("ul[data-type='taskList']")) ||
         e.clientY < toolbarRect.top
       ) {
         const targetStyle = getComputedStyle(target);

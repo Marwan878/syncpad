@@ -1,3 +1,4 @@
 export default function getRandomHex() {
-  return Math.floor(Math.random() * 0xffffff).toString(16);
+  // I've chosen 0xDDDDDD to prevent getting light colors as the editor is already using a light theme
+  return Math.floor(Math.random() * 0xdddddd).toString(16);
 }

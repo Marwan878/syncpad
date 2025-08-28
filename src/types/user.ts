@@ -4,6 +4,7 @@ export type User = {
   email?: string;
   avatar_url?: string;
   created_at: string;
+  public_key_jwk?: JsonWebKey;
 };
 
 export type AccessManagedUser = {

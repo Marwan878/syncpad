@@ -1,8 +1,8 @@
-import { ClerkClient } from "@/lib/clerk-client";
+import { AuthService } from "@/lib/services/auth-service";
 import { handleError, ValidationError } from "@/lib/error";
-import { PageService } from "@/lib/page-service";
+import { PageService } from "@/lib/services/page-service";
 import { redis } from "@/lib/redis";
-import { WorkspaceService } from "@/lib/workspace-service";
+import { WorkspaceService } from "@/lib/services/workspace-service";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
@@ -17,8 +17,8 @@ export async function PATCH(
     }
 
     // Authentication and authorization
-    const clerkClient = ClerkClient.getInstance();
-    await clerkClient.authenticateRequest(request);
+    const clerkClient = AuthService.getInstance();
+    await clerkClient.checkSignedIn(request);
 
     // Patch the page
     const updates = await request.json();
@@ -48,8 +48,8 @@ export async function GET(
       throw new ValidationError("Page ID is required");
     }
 
-    const clerkClient = ClerkClient.getInstance();
-    const userId = await clerkClient.authenticateRequest(request);
+    const clerkClient = AuthService.getInstance();
+    const userId = await clerkClient.checkSignedIn(request);
 
     // Check if user can view workspace
     const workspaceService = WorkspaceService.getInstance();
@@ -72,18 +72,9 @@ export async function DELETE(
   try {
     const { workspaceId, pageId } = await params;
 
-    // TODO: Delegate this check to other functions
-    if (!workspaceId) {
-      throw new ValidationError("Workspace ID is required");
-    }
-
-    if (!pageId) {
-      throw new ValidationError("Page ID is required");
-    }
-
     // Authentication and authorization
-    const clerkClient = ClerkClient.getInstance();
-    const userId = await clerkClient.authenticateRequest(request);
+    const clerkClient = AuthService.getInstance();
+    const userId = await clerkClient.checkSignedIn(request);
 
     // Check if user can delete page
     const pageService = PageService.getInstance();

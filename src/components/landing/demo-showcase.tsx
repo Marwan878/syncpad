@@ -1,10 +1,7 @@
-import Image from "next/image";
 import { Container } from "../ui";
 import FloatingIndicator from "../ui/status-indicator";
 
-// TODO: Add an actual video
-
-export default function ImageShowcase() {
+export default function DemoShowcase() {
   return (
     <Container as="section" className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-2xl text-center mb:16 sm:mb-32">
@@ -18,13 +15,14 @@ export default function ImageShowcase() {
       </div>
 
       <div className="relative rounded-xl p-2 ring-1 ring-inset ring-background-muted/10 lg:-m-4 lg:rounded-2xl lg:p-4 overflow-hidden bg-white shadow-2xl">
-        <Image
-          src="/brand.png"
-          alt="SyncPad interface showcasing clean design and collaborative features"
-          width={1000}
-          height={500}
-          className="w-full object-cover object-center"
-          priority
+        <video
+          src="/demo.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+          preload="auto"
         />
 
         <FloatingIndicator

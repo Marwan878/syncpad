@@ -1,7 +1,7 @@
 import { Page, PageWithByte64Content } from "@/types/page";
-import { HasuraClient } from "./hasura-client";
+import { HasuraClient } from "../hasura-client";
 import { WorkspaceService } from "./workspace-service";
-import { ForbiddenError } from "./error";
+import { ForbiddenError, ValidationError } from "../error";
 
 const PAGES_QUERY = `
     query Pages($workspaceId: uuid!) {
@@ -94,8 +94,12 @@ export class PageService {
   }
 
   async getPagesByWorkspaceId(
-    workspaceId: string
+    workspaceId: string | undefined
   ): Promise<PageWithByte64Content[]> {
+    if (!workspaceId) {
+      throw new ValidationError("Workspace ID is required");
+    }
+
     const data = await this.hasura.query<{
       pages: PageWithByte64Content[];
     }>(PAGES_QUERY, { workspaceId });
@@ -120,8 +124,13 @@ export class PageService {
     return data.pages_by_pk;
   }
 
-  async checkUserCanDeletePage(workspaceId: string, userId: string) {
-    // TODO: Take the permissions from a dedicated endpoint
+  async checkUserCanDeletePage(
+    workspaceId: string | undefined,
+    userId: string
+  ) {
+    if (!workspaceId) {
+      throw new ValidationError("Workspace ID is required");
+    }
 
     const workspaceService = WorkspaceService.getInstance();
     const workspace = await workspaceService.getWorkspaceById(workspaceId);
@@ -135,7 +144,11 @@ export class PageService {
     }
   }
 
-  async deletePageAndDecrementPagesCountAndReorder(pageId: string) {
+  async deletePageAndDecrementPagesCountAndReorder(pageId: string | undefined) {
+    if (!pageId) {
+      throw new ValidationError("Page ID is required");
+    }
+
     const data = await this.hasura.query<{
       delete_page_and_decrement_pages_count_and_reorder: Page;
     }>(DELETE_PAGE_AND_DECREMENT_PAGES_COUNT_AND_REORDER_MUTATION, { pageId });

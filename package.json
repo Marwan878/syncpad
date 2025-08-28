@@ -10,7 +10,6 @@
     "collab-server": "node ./node_modules/y-websocket/bin/server.js --port 1234"
   },
   "dependencies": {
-    "@apollo/client": "^3.13.8",
     "@clerk/nextjs": "^6.25.4",
     "@edgestore/react": "^0.5.3",
     "@edgestore/server": "^0.5.3",
@@ -40,9 +39,7 @@
     "@tiptap/react": "^3.0.9",
     "@tiptap/starter-kit": "^3.0.9",
     "@tiptap/y-tiptap": "^3.0.0",
-    "@uploadthing/react": "^7.3.2",
     "clsx": "^2.1.1",
-    "graphql": "^16.11.0",
     "ioredis": "^5.7.0",
     "jspdf": "^3.0.1",
     "lodash.throttle": "^4.1.1",

@@ -1,6 +1,6 @@
 import { User } from "@/types/user";
-import { ValidationError } from "./error";
-import { HasuraClient } from "./hasura-client";
+import { ValidationError } from "../error";
+import { HasuraClient } from "../hasura-client";
 
 const USER_QUERY = `
     query GetUser($userId: String!) {
@@ -10,6 +10,7 @@ const USER_QUERY = `
             email
             avatar_url
             created_at
+            public_key_jwk
         }
     }
 `;
@@ -41,6 +42,19 @@ const CREATE_USER = `
       created_at: $created_at
     }) {
       id
+    }
+  }
+`;
+
+const UPDATE_USER = `
+  mutation UpdateUser($userId: String!, $user: users_set_input!) {
+    update_users_by_pk(pk_columns: { id: $userId }, _set: $user) {
+      id
+      name
+      email
+      avatar_url
+      created_at
+      public_key_jwk
     }
   }
 `;
@@ -84,5 +98,13 @@ export class UserService {
     }>(CREATE_USER, { user });
 
     return data.insert_users_one;
+  }
+
+  async updateUser(userId: string, user: Partial<User>): Promise<User> {
+    const data = await this.hasura.query<{
+      update_users_by_pk: User;
+    }>(UPDATE_USER, { userId, user });
+
+    return data.update_users_by_pk;
   }
 }

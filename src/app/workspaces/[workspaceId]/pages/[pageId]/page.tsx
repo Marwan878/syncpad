@@ -1,16 +1,12 @@
 "use client";
 
-// TODO: End-to-End Encryption (optional advanced)
-// TODO: Encrypt content client-side for privacy.
-// TODO: Decrypt only on the client, backend stores encrypted blobs.
-// TODO: Scalable architecture for multiple users
 // TODO: Comprehensive testing
-// TODO: Ensure proper cursor positioning of other collaborators
-// TODO: Complete all TODOs
+// TODO: Ensure proper connection status indication
 
 // --- Hooks ---
 import useConfiguredEditor from "@/hooks/use-configured-editor";
 import useCustomCursor from "@/hooks/use-custom-cursor";
+import useIsTouchScreen from "@/hooks/use-is-touch-screen";
 import useLiveCollaboration from "@/hooks/use-live-collaboration";
 import useMobileView from "@/hooks/use-mobile-view";
 import { useAuth } from "@clerk/nextjs";
@@ -28,7 +24,7 @@ import CollaborationIndicators from "@/components/collaboration/collaboration-in
 import ConfirmDeleteTableModal from "@/components/page/editor/confirm-delete-table-modal";
 import Cursor from "@/components/page/editor/cursor";
 import TableMenu from "@/components/page/editor/table-menu";
-import ForbiddenMessage from "@/components/page/forbidden-message";
+import ForbiddenMessage from "@/components/workspace/forbidden-message";
 import Toolbar from "@/components/page/toolbar/toolbar";
 import {
   Breadcrumb,
@@ -46,7 +42,6 @@ import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import { Page as PageType } from "@/types/page";
 import { Workspace } from "@/types/workspace";
 import { CSSProperties } from "react";
-import useIsTouchScreen from "@/hooks/use-is-touch-screen";
 
 export default function Page() {
   const { isMobile, mobileView, setMobileView } = useMobileView();
@@ -65,6 +60,7 @@ export default function Page() {
   };
 
   const { getToken, userId, isLoaded: isAuthLoaded } = useAuth();
+
   const { data: workspaceData, isLoading: isPermissionsLoading } = useQuery({
     queryKey: ["workspace", workspaceId],
     queryFn: async () => {
@@ -75,7 +71,6 @@ export default function Page() {
         userId,
       });
 
-      // TODO: Change this (Make the backend decide the permissions not the frontend)
       const canEdit = !!(
         userId &&
         (workspace.owner_id === userId ||
@@ -110,10 +105,12 @@ export default function Page() {
   });
 
   const { ydoc, provider, status } = useLiveCollaboration(workspaceId, pageId);
+
   const editor = useConfiguredEditor(
     ydoc,
     workspaceData?.accessData?.canEdit ?? false
   );
+
   const { cursorRef, isCursorVisible, cursorType } = useCustomCursor(
     editor,
     topElementRef,

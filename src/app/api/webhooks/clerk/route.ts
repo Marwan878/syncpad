@@ -1,5 +1,5 @@
 import { handleError } from "@/lib/error";
-import { UserService } from "@/lib/user-service";
+import { UserService } from "@/lib/services/user-service";
 import { User } from "@/types/user";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { NextRequest, NextResponse } from "next/server";

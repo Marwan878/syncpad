@@ -1,6 +1,6 @@
 import { Workspace } from "@/types/workspace";
-import { ValidationError, ForbiddenError } from "./error";
-import { HasuraClient } from "./hasura-client";
+import { ValidationError, ForbiddenError } from "../error";
+import { HasuraClient } from "../hasura-client";
 
 const WORKSPACE_QUERY = `
     query Workspace($id: uuid!) {
@@ -103,7 +103,17 @@ const CREATE_WORKSPACE_MUTATION = `
 const UPDATE_WORKSPACE_MUTATION = `
   mutation UpdateWorkspace($id: uuid!, $updates: workspaces_set_input!) {
     update_workspaces_by_pk(pk_columns: { id: $id }, _set: $updates) {
-      id
+        id
+        name
+        description
+        pages_count
+        created_at
+        updated_at
+        owner_id
+        allowed_viewers_ids
+        allowed_editors_ids
+        any_user_can_edit
+        any_user_can_view
     }
   }
 `;
@@ -172,7 +182,13 @@ export class WorkspaceService {
     }>(CREATE_WORKSPACE_MUTATION, { newWorkspace });
   }
 
-  async deleteWorkspaceAndPagesById(workspaceId: string): Promise<Workspace> {
+  async deleteWorkspaceAndPagesById(
+    workspaceId: string | undefined
+  ): Promise<Workspace> {
+    if (!workspaceId) {
+      throw new ValidationError("Workspace ID is required");
+    }
+
     const data = await this.hasura.query<{
       delete_workspace_and_pages: Workspace;
     }>(DELETE_WORKSPACE_AND_PAGES_MUTATION, {
@@ -182,7 +198,14 @@ export class WorkspaceService {
     return data.delete_workspace_and_pages;
   }
 
-  async checkUserCanDelete(workspaceId: string, userId: string): Promise<void> {
+  async checkUserCanDelete(
+    workspaceId: string | undefined,
+    userId: string
+  ): Promise<void> {
+    if (!workspaceId) {
+      throw new ValidationError("Workspace ID is required");
+    }
+
     const data = await this.hasura.query<{
       workspaces_by_pk: {
         id: string;
@@ -195,7 +218,14 @@ export class WorkspaceService {
     }
   }
 
-  async checkUserCanView(workspaceId: string, userId: string): Promise<void> {
+  async checkUserCanView(
+    workspaceId: string | undefined,
+    userId: string
+  ): Promise<void> {
+    if (!workspaceId) {
+      throw new ValidationError("Workspace ID is required");
+    }
+
     const workspace = await this.getWorkspaceById(workspaceId);
     // If workspace allows public access, no need to check further
     if (workspace.any_user_can_view || workspace.any_user_can_edit) {
@@ -213,7 +243,14 @@ export class WorkspaceService {
     }
   }
 
-  async checkUserCanEdit(workspaceId: string, userId: string): Promise<void> {
+  async checkUserCanEdit(
+    workspaceId: string | undefined,
+    userId: string
+  ): Promise<void> {
+    if (!workspaceId) {
+      throw new ValidationError("Workspace ID is required");
+    }
+
     const workspace = await this.getWorkspaceById(workspaceId);
     if (workspace.any_user_can_edit) {
       return;
@@ -234,22 +271,38 @@ export class WorkspaceService {
     workspaceId,
     updates,
   }: {
-    workspaceId?: string;
+    workspaceId: string | undefined;
     updates: Partial<Omit<Workspace, "id" | "created_at" | "updated_at">>;
-  }): Promise<void> {
-    await this.hasura.query<void>(UPDATE_WORKSPACE_MUTATION, {
+  }) {
+    if (!workspaceId) {
+      throw new ValidationError("Workspace ID is required");
+    }
+
+    const data = await this.hasura.query<{
+      update_workspaces_by_pk: Workspace;
+    }>(UPDATE_WORKSPACE_MUTATION, {
       id: workspaceId,
       updates: {
         ...updates,
         updated_at: new Date().toISOString(),
       },
     });
+
+    return data.update_workspaces_by_pk;
   }
 
   async checkUserCanModifyWorkspace(
-    userId: string,
-    workspaceId?: string
+    userId: string | undefined,
+    workspaceId: string | undefined
   ): Promise<void> {
+    if (!userId) {
+      throw new ValidationError("User ID is required");
+    }
+
+    if (!workspaceId) {
+      throw new ValidationError("Workspace ID is required");
+    }
+
     const workspace = await this.getWorkspaceById(workspaceId);
     if (workspace.owner_id !== userId) {
       throw new ForbiddenError("You are not the owner of this workspace");

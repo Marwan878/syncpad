@@ -1,6 +1,6 @@
-import { ClerkClient } from "@/lib/clerk-client";
-import { handleError, ValidationError } from "@/lib/error";
-import { WorkspaceService } from "@/lib/workspace-service";
+import { AuthService } from "@/lib/services/auth-service";
+import { handleError } from "@/lib/error";
+import { WorkspaceService } from "@/lib/services/workspace-service";
 import { Permission } from "@/types/workspace";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,11 +10,6 @@ export async function GET(
 ) {
   try {
     const { workspaceId } = await params;
-
-    // TODO: Delegate this validation to other functions
-    if (!workspaceId) {
-      throw new ValidationError("Workspace ID is required");
-    }
 
     const permissions: Set<Permission> = new Set();
 
@@ -28,11 +23,11 @@ export async function GET(
       permissions.add("view");
     }
 
-    const clerkClient = ClerkClient.getInstance();
+    const clerkClient = AuthService.getInstance();
     const isSignedIn = await clerkClient.isSignedIn(request);
 
     if (isSignedIn) {
-      const userId = await clerkClient.authenticateRequest(request);
+      const userId = await clerkClient.checkSignedIn(request);
       if (workspace.allowed_viewers_ids.includes(userId)) {
         permissions.add("view");
       }

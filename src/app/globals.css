@@ -208,6 +208,10 @@ body:has(.simple-editor-content) {
   overflow-x: hidden;
 }
 
+main:has(.simple-editor-content) {
+  cursor: none;
+}
+
 main:has(.simple-editor-content) * {
   cursor: none;
 }

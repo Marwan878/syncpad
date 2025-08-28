@@ -1,14 +1,14 @@
-import { ClerkClient } from "@/lib/clerk-client";
+import { AuthService } from "@/lib/services/auth-service";
 import { handleError } from "@/lib/error";
 import { redis } from "@/lib/redis";
-import { WorkspaceService } from "@/lib/workspace-service";
+import { WorkspaceService } from "@/lib/services/workspace-service";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
     // Authentication
-    const clerkClient = ClerkClient.getInstance();
-    const userId = await clerkClient.authenticateRequest(request);
+    const clerkClient = AuthService.getInstance();
+    const userId = await clerkClient.checkSignedIn(request);
 
     // Return cached shared workspaces if they exist
     const cacheKey = `shared-workspaces:${userId}`;

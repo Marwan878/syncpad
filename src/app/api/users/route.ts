@@ -1,6 +1,6 @@
-import { ClerkClient } from "@/lib/clerk-client";
+import { AuthService } from "@/lib/services/auth-service";
 import { handleError } from "@/lib/error";
-import { UserService } from "@/lib/user-service";
+import { UserService } from "@/lib/services/user-service";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -9,8 +9,8 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get("query");
 
     // Authentication
-    const clerkClient = ClerkClient.getInstance();
-    await clerkClient.authenticateRequest(request);
+    const clerkClient = AuthService.getInstance();
+    await clerkClient.checkSignedIn(request);
 
     // Search users
     const userService = UserService.getInstance();

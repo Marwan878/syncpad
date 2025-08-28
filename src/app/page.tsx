@@ -3,14 +3,14 @@ import {
   Features,
   CallToAction,
   Footer,
-  ImageShowcase,
+  DemoShowcase,
 } from "@/components/landing";
 
 export default function Home() {
   return (
     <div className="bg-white">
       <Hero />
-      <ImageShowcase />
+      <DemoShowcase />
       <Features />
       <CallToAction />
       <Footer />
