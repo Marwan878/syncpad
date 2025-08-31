@@ -177,7 +177,7 @@ export async function PATCH(
         const ownerKey: EncryptionKey = {
           id: crypto.randomUUID(),
           user_id: patchedWorkspace.owner_id,
-          workspace_id: workspaceId,
+          workspace_id: workspaceId!,
           key: Array.from(encryptedWorkspaceKey).join(","), // Store as comma-separated string
         };
         await keyService.createKey(ownerKey);
@@ -198,7 +198,7 @@ export async function PATCH(
         const newKey: EncryptionKey = {
           id: crypto.randomUUID(),
           user_id: collaboratorId,
-          workspace_id: workspaceId,
+          workspace_id: workspaceId!,
           key: Array.from(encryptedKey).join(","), // Store as comma-separated string
         };
         await keyService.createKey(newKey);
