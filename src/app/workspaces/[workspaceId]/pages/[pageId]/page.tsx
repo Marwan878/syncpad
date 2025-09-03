@@ -2,6 +2,7 @@
 
 // TODO: Comprehensive testing
 // TODO: Ensure proper connection status indication
+// TODO: Fix issue where cursor disappears when hovering an uploading image
 
 // --- Hooks ---
 import useConfiguredEditor from "@/hooks/use-configured-editor";
@@ -150,14 +151,16 @@ export default function Page() {
           </BreadcrumbItem>
         </Breadcrumb>
       </Container>
-      <Toolbar
-        editor={editor}
-        isMobile={isMobile}
-        mobileView={mobileView}
-        setMobileView={setMobileView}
-        toolbarRef={toolbarRef}
-        pageTitle={page.title}
-      />
+      {workspaceData.accessData?.canEdit && (
+        <Toolbar
+          editor={editor}
+          isMobile={isMobile}
+          mobileView={mobileView}
+          setMobileView={setMobileView}
+          toolbarRef={toolbarRef}
+          pageTitle={page.title}
+        />
+      )}
       <div
         className="relative"
         style={{ "--cursor": "ibeam" } as CSSProperties}

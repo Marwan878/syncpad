@@ -95,7 +95,7 @@ export class UserService {
   async createUser(user: User): Promise<User> {
     const data = await this.hasura.query<{
       insert_users_one: User;
-    }>(CREATE_USER, { user });
+    }>(CREATE_USER, user);
 
     return data.insert_users_one;
   }
